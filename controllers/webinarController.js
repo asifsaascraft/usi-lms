@@ -43,27 +43,70 @@ export const getActiveWebinars = async (req, res) => {
   }
 };
 
-
 // =======================
-// Get all live webinars (public)
+// Get Active USI Webinars
 // =======================
-export const getLiveWebinars = async (req, res) => {
+export const getActiveUSIWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find().sort({ startDate: 1 });
-
-    // Filter webinars where dynamicStatus is "Live" or "Running"
-    const liveWebinars = webinars
-      .map((w) => w.toObject({ virtuals: true }))
-      .filter((w) => w.dynamicStatus === "Live" || w.dynamicStatus === "Running");
+    const webinars = await Webinar.find({
+      webinarType: "USI Webinar",
+      status: "Active",
+    }).sort({ createdAt: -1 });
 
     res.json({
       success: true,
-      data: liveWebinars,
+      data: webinars.map((w) => w.toObject({ virtuals: true })),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch live webinars",
+      message: "Failed to fetch USI Webinars",
+      error: error.message,
+    });
+  }
+};
+
+// =======================
+// Get Active Smart Learning Program Webinars
+// =======================
+export const getActiveSmartLearningWebinars = async (req, res) => {
+  try {
+    const webinars = await Webinar.find({
+      webinarType: "Smart Learning Program",
+      status: "Active",
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: webinars.map((w) => w.toObject({ virtuals: true })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch Smart Learning webinars",
+      error: error.message,
+    });
+  }
+};
+
+// =======================
+// Get Active Live Operative Workshops
+// =======================
+export const getActiveLiveWorkshops = async (req, res) => {
+  try {
+    const webinars = await Webinar.find({
+      webinarType: "Live Operative Workshops",
+      status: "Active",
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: webinars.map((w) => w.toObject({ virtuals: true })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch Live Workshops",
       error: error.message,
     });
   }
@@ -104,14 +147,15 @@ export const createWebinar = async (req, res) => {
 
     const webinarData = {
       ...req.body,
-      webinarImage: req.file.location,
+      image: req.file.location,
     };
 
     const newWebinar = await Webinar.create(webinarData);
 
-    res
-      .status(201)
-      .json({ success: true, data: newWebinar.toObject({ virtuals: true }) });
+    res.status(201).json({
+      success: true,
+      data: newWebinar.toObject({ virtuals: true }),
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -129,7 +173,7 @@ export const updateWebinar = async (req, res) => {
     const { id } = req.params;
 
     const updatedData = { ...req.body };
-    if (req.file) updatedData.webinarImage = req.file.location;
+    if (req.file) updatedData.image = req.file.location;
 
     const updatedWebinar = await Webinar.findByIdAndUpdate(id, updatedData, {
       new: true,
@@ -142,7 +186,10 @@ export const updateWebinar = async (req, res) => {
         .json({ success: false, message: "Webinar not found" });
     }
 
-    res.json({ success: true, data: updatedWebinar.toObject({ virtuals: true }) });
+    res.json({
+      success: true,
+      data: updatedWebinar.toObject({ virtuals: true }),
+    });
   } catch (error) {
     res.status(500).json({
       success: false,

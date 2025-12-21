@@ -5,14 +5,18 @@ import moment from "moment-timezone";
 // Schema
 const WebinarSchema = new mongoose.Schema(
   {
-    webinarName: {
+    webinarType: {
       type: String,
-      required: [true, "Webinar Name is required"],
+      enum: ["USI Webinar", "Smart Learning Program", "Live Operative Workshops"],
+      required: [true, "Webinar Type is required"],
     },
-    
-    webinarImage: {
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+    },
+    image: {
       type: String, // store file path or URL
-      required: [true, "Webinar Image is required"],
+      required: [true, "Image is required"],
     },
     startDate: {
       type: String, // Format: DD/MM/YYYY
@@ -53,11 +57,37 @@ const WebinarSchema = new mongoose.Schema(
       type: String,
       required: [true, "Stream Link is required"],
     },
+    description: {
+      type: String,
+    },
     
     // status removed from schema because we calculate it dynamically
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+/**
+ *  Auto set amount = 0 when registrationType = free
+ */
+WebinarSchema.pre("save", function (next) {
+  if (this.registrationType === "free") {
+    this.amount = 0;
+  }
+  next();
+});
+
+/**
+ *  Auto set amount = 0 when updating a webinar
+ */
+WebinarSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+
+  if (update.registrationType === "free") {
+    update.amount = 0;
+  }
+
+  next();
+});
 
 /**
  * Virtual: Dynamic event status

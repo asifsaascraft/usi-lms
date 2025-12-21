@@ -3,12 +3,15 @@ import express from "express";
 import {
   getWebinars,
   getActiveWebinars,
-  getLiveWebinars,
+  getActiveUSIWebinars,
+  getActiveSmartLearningWebinars,
+  getActiveLiveWorkshops,
   getWebinarById,
   createWebinar,
   updateWebinar,
   deleteWebinar,
 } from "../controllers/webinarController.js";
+
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadWebinarImage } from "../middlewares/uploadMiddleware.js";
 
@@ -20,9 +23,16 @@ router.get("/webinars", getWebinars);
 // Public: Get all active webinars
 router.get("/webinars/active", getActiveWebinars);
 
-// Public: Get all live webinars
-router.get("/webinars/live", getLiveWebinars);
+// Get Active USI Webinars
+router.get("/webinars/usi/active", getActiveUSIWebinars);
 
+// Get Active Smart Learning Webinars
+router.get("/webinars/smart-learning/active", getActiveSmartLearningWebinars);
+
+// Get Active Live Workshop Webinars
+router.get("/webinars/live-workshops/active", getActiveLiveWorkshops);
+
+// Public: Get webinar BY ID
 router.get("/webinars/:id", getWebinarById);
 
 // Admin-only: Create a new webinar
@@ -30,7 +40,7 @@ router.post(
   "/admin/webinars",
   protect,
   authorizeRoles("admin"),
-  uploadWebinarImage.single("webinarImage"),
+  uploadWebinarImage.single("image"),
   createWebinar
 );
 
@@ -39,7 +49,7 @@ router.put(
   "/admin/webinars/:id",
   protect,
   authorizeRoles("admin"),
-  uploadWebinarImage.single("webinarImage"),
+  uploadWebinarImage.single("image"),
   updateWebinar
 );
 
