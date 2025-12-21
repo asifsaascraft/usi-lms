@@ -2,6 +2,7 @@
 import express from "express";
 import {
   getWebinars,
+  getActiveWebinarById,
   getActiveWebinars,
   getActiveUSIWebinars,
   getActiveSmartLearningWebinars,
