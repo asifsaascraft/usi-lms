@@ -16,6 +16,8 @@ import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadWebinarImage } from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
+// Public: Get active webinar BY ID
+router.get("/webinars/active/:id", getActiveWebinarById);
 
 // Public: anyone can view all webinars
 router.get("/webinars", getWebinars);
