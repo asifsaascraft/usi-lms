@@ -8,6 +8,7 @@ import {
   getUserProfile,
   updateUserProfile,
   getAllUsers,
+  updateUserStatus,
 } from "../controllers/userController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadUSIProfileImage } from "../middlewares/uploadMiddleware.js";
@@ -62,6 +63,14 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getAllUsers
+);
+
+// Update User Status – Admin only
+router.put(
+  "/status/:userId",
+  protect,
+  authorizeRoles("admin"),
+  updateUserStatus
 );
 
 

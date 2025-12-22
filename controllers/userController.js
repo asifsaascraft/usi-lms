@@ -284,3 +284,41 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// =======================
+// Update User Status – Admin only
+// =======================
+export const updateUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { status } = req.body; // expected: "Pending" or "Approved"
+
+    // Validate status input
+    if (!["Pending", "Approved"].includes(status)) {
+      return res.status(400).json({
+        message: "Invalid status value. Allowed: Pending, Approved",
+      });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Update status
+    user.status = status;
+    await user.save();
+
+    res.status(200).json({
+      message: `User status updated to ${status}`,
+      user,
+    });
+  } catch (error) {
+    console.error("Update status error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
