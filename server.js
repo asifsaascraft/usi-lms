@@ -17,6 +17,7 @@ import assignSpeakerRoutes from "./routes/assignSpeakerRoutes.js";
 import webinarRegistrationRoutes from "./routes/webinarRegistrationRoutes.js";
 import courseRegistrationRoutes from "./routes/courseRegistrationRoutes.js";
 import weekCategoryRoutes from "./routes/weekCategoryRoutes.js";
+import courseModuleRoutes from "./routes/courseModuleRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 
 await connectDB();
@@ -66,6 +67,7 @@ app.use("/api", assignSpeakerRoutes);
 app.use("/api", webinarRegistrationRoutes);
 app.use("/api", courseRegistrationRoutes);
 app.use("/api", weekCategoryRoutes);
+app.use("/api", courseModuleRoutes);
 app.use("/api", commentRoutes);
 
 
