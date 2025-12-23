@@ -41,6 +41,7 @@ const pdfFileFilter = (req, file, cb) => {
 
 //  Export uploaders for different folders
 export const uploadWebinarImage = createUploader("webinars");
+export const uploadCourseImage = createUploader("courses");
 export const uploadUSIProfileImage = createUploader("usi-profile-pictures");
 export const uploadSpeakerProfileImage = createUploader("speaker-profile-pictures");
 

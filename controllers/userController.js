@@ -117,7 +117,7 @@ export const loginUser = async (req, res) => {
     if (user.status !== "Approved") {
       return res.status(403).json({
         message:
-          "You have registered, but your account is pending approval. Contact admin.",
+          "You have registered successfully, wait for admin approval.",
       });
     }
 
