@@ -14,6 +14,7 @@ import webinarRoutes from "./routes/webinarRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
 import assignSpeakerRoutes from "./routes/assignSpeakerRoutes.js";
 import webinarRegistrationRoutes from "./routes/webinarRegistrationRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 
 await connectDB();
 
@@ -59,6 +60,7 @@ app.use("/api", webinarRoutes);
 app.use("/api", speakerRoutes);
 app.use("/api", assignSpeakerRoutes);
 app.use("/api", webinarRegistrationRoutes);
+app.use("/api", commentRoutes);
 
 
 // =======================
