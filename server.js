@@ -23,6 +23,7 @@ import moduleCommentRoutes from "./routes/moduleCommentRoutes.js";
 import askedQAndARoutes from "./routes/askedQAndARoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import sendFeedbackRoutes from "./routes/sendFeedbackRoutes.js";
+import quizRoutes from "./routes/quizRoutes.js";
 
 await connectDB();
 
@@ -77,6 +78,7 @@ app.use("/api", moduleCommentRoutes);
 app.use("/api", askedQAndARoutes);
 app.use("/api", feedbackRoutes);
 app.use("/api", sendFeedbackRoutes);
+app.use("/api", quizRoutes);
 
 
 
