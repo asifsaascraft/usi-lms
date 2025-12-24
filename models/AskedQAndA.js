@@ -7,7 +7,7 @@ const AskedQAndASchema = new mongoose.Schema(
       ref: "Webinar",
       required: true,
     },
-     questionsAndAnswers: [
+    questionsAndAnswers: [
       {
         question: {
           type: String,
@@ -17,7 +17,6 @@ const AskedQAndASchema = new mongoose.Schema(
           type: String,
           required: [true, "Answer is required"],
         },
-        
       },
     ],
   },

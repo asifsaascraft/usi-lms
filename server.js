@@ -21,6 +21,7 @@ import courseModuleRoutes from "./routes/courseModuleRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import moduleCommentRoutes from "./routes/moduleCommentRoutes.js";
 import askedQAndARoutes from "./routes/askedQAndARoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 await connectDB();
 
@@ -73,6 +74,7 @@ app.use("/api", courseModuleRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", moduleCommentRoutes);
 app.use("/api", askedQAndARoutes);
+app.use("/api", feedbackRoutes);
 
 
 
