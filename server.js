@@ -24,6 +24,7 @@ import askedQAndARoutes from "./routes/askedQAndARoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import sendFeedbackRoutes from "./routes/sendFeedbackRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
+import submitQuizRoutes from "./routes/submitQuizRoutes.js";
 
 await connectDB();
 
@@ -79,6 +80,7 @@ app.use("/api", askedQAndARoutes);
 app.use("/api", feedbackRoutes);
 app.use("/api", sendFeedbackRoutes);
 app.use("/api", quizRoutes);
+app.use("/api", submitQuizRoutes);
 
 
 
