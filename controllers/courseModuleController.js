@@ -158,6 +158,7 @@ export const createCourseModule = async (req, res) => {
       courseModuleName,
       contentType,
       contentLink,
+      description,
       duration,
       status,
     } = req.body;
@@ -190,6 +191,7 @@ export const createCourseModule = async (req, res) => {
       courseModuleName,
       contentType,
       contentLink,
+      description,
       duration,
       status,
     });

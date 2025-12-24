@@ -24,6 +24,9 @@ const CourseModuleSchema = new mongoose.Schema(
       type: String,
       required: [true, "Content link is required"],
     },
+    description: {
+      type: String,
+    },
     duration: {
       type: String,
     },
