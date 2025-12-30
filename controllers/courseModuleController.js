@@ -133,6 +133,7 @@ export const createCourseModule = async (req, res) => {
       videoDuration,
       additionalQuestions,
       additionalResources,
+      isCheckBox,
     } = req.body;
 
     // Validate course
@@ -167,6 +168,7 @@ export const createCourseModule = async (req, res) => {
       videoDuration,
       additionalQuestions,
       additionalResources,
+      isCheckBox: Boolean(isCheckBox),
     });
 
     res.status(201).json({
@@ -246,3 +248,43 @@ export const deleteCourseModule = async (req, res) => {
     });
   }
 };
+
+/**
+ * ============================
+ * Mark module as completed (User)
+ * ============================
+ */
+export const markModuleAsChecked = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const module = await CourseModule.findById(id);
+
+    if (!module) {
+      return res.status(404).json({
+        success: false,
+        message: "Course module not found",
+      });
+    }
+
+    // Only update isCheckBox
+    module.isCheckBox = true;
+    await module.save();
+
+    res.json({
+      success: true,
+      message: "Module marked as completed",
+      data: {
+        _id: module._id,
+        isCheckBox: module.isCheckBox,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update module status",
+      error: error.message,
+    });
+  }
+};
+

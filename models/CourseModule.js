@@ -39,6 +39,10 @@ const CourseModuleSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    isCheckBox: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

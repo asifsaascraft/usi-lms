@@ -7,6 +7,7 @@ import {
   createCourseModule,
   updateCourseModule,
   deleteCourseModule,
+  markModuleAsChecked,
 } from "../controllers/courseModuleController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -62,6 +63,20 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   deleteCourseModule
+);
+
+/**
+ * ============================
+ * User Routes
+ * ============================
+ */
+
+// Mark module as completed (checkbox true)
+router.patch(
+  "/modules/:id/check",
+  protect, // user must be logged in
+  authorizeRoles("user"),
+  markModuleAsChecked
 );
 
 export default router;
