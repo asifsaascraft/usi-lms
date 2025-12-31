@@ -2,6 +2,7 @@
 import express from "express";
 import {
   submitFeedback,
+  getMyFeedbackByWebinar,
   getAllSubmitFeedbacksByWebinar,
 } from "../controllers/sendFeedbackController.js";
 
@@ -18,6 +19,18 @@ router.post(
   authorizeRoles("user"),
   submitFeedback
 );
+
+
+/**
+ * User gets own submitted feedback
+ */
+router.get(
+  "/webinars/:webinarId/my-feedback",
+  protect,
+  authorizeRoles("user"),
+  getMyFeedbackByWebinar
+);
+
 
 /**
  * Admin views all submitted feedbacks

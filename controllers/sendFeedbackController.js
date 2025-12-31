@@ -68,6 +68,52 @@ export const submitFeedback = async (req, res) => {
 
 /**
  * ==========================================
+ * GET Logged-in User Feedback by Webinar
+ * ==========================================
+ */
+export const getMyFeedbackByWebinar = async (req, res) => {
+  try {
+    const { webinarId } = req.params;
+    const userId = req.user.id; // from JWT (protect middleware)
+
+    // Validate webinar
+    const webinar = await Webinar.findById(webinarId);
+    if (!webinar) {
+      return res.status(404).json({
+        success: false,
+        message: "Webinar not found",
+      });
+    }
+
+    // Find user's feedback
+    const feedback = await SendFeedback.findOne({
+      webinarId,
+      userId,
+    });
+
+    if (!feedback) {
+      return res.status(404).json({
+        success: false,
+        message: "You have not submitted feedback for this webinar",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: feedback,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch user feedback",
+      error: error.message,
+    });
+  }
+};
+
+
+/**
+ * ==========================================
  * GET All Submitted Feedbacks (Admin only)
  * ==========================================
  */
