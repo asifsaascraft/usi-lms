@@ -45,7 +45,7 @@ router.get(
  * User views own submitted quizzes of a webinar
  */
 router.get(
-  "/webinars/:webinarId/my-quizzes-submission",
+  "/webinars/:webinarId/my-quizzes-submissions",
   protect,
   authorizeRoles("user"),
   getMySubmittedQuizzesByWebinar
