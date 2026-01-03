@@ -12,6 +12,8 @@ import {
 } from "../controllers/userController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadUSIProfileImage } from "../middlewares/uploadMiddleware.js";
+import { getMyAllRegistrations } from "../controllers/userRegistrationController.js";
+
 
 const router = express.Router();
 
@@ -71,6 +73,16 @@ router.put(
   protect,
   authorizeRoles("admin"),
   updateUserStatus
+);
+
+// =======================
+// Get My All Registrations (Course + Webinar)
+// =======================
+router.get(
+  "/registrations",
+  protect,
+  authorizeRoles("user"),
+  getMyAllRegistrations
 );
 
 
