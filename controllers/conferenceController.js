@@ -169,11 +169,17 @@ export const getConferenceDateRange = async (req, res) => {
       return new Date(year, month - 1, day);
     };
 
+    // Format Date → DD/MM/YYYY
     const formatDate = (date) => {
       const dd = String(date.getDate()).padStart(2, "0");
       const mm = String(date.getMonth() + 1).padStart(2, "0");
       const yyyy = date.getFullYear();
       return `${dd}/${mm}/${yyyy}`;
+    };
+
+    // Get Day Name (Thursday, Friday, etc.)
+    const getDayName = (date) => {
+      return date.toLocaleDateString("en-US", { weekday: "long" });
     };
 
     const start = parseDate(startDate);
@@ -183,7 +189,10 @@ export const getConferenceDateRange = async (req, res) => {
     const current = new Date(start);
 
     while (current <= end) {
-      dates.push(formatDate(current));
+      dates.push({
+        date: formatDate(current),
+        day: getDayName(current),
+      });
       current.setDate(current.getDate() + 1);
     }
 
@@ -202,3 +211,4 @@ export const getConferenceDateRange = async (req, res) => {
     });
   }
 };
+
