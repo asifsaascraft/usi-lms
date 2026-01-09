@@ -23,6 +23,7 @@ import conferenceRegistrationRoutes from "./routes/conferenceRegistrationRoutes.
 import hallRoutes from "./routes/hallRoutes.js";
 import trackRoutes from "./routes/trackRoutes.js";
 import sessionRoutes from "./routes/sessionRoutes.js";
+import topicRoutes from "./routes/topicRoutes.js";
 import weekCategoryRoutes from "./routes/weekCategoryRoutes.js";
 import courseModuleRoutes from "./routes/courseModuleRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
@@ -86,6 +87,7 @@ app.use("/api", conferenceRegistrationRoutes);
 app.use("/api", hallRoutes);
 app.use("/api", trackRoutes);
 app.use("/api", sessionRoutes);
+app.use("/api", topicRoutes);
 app.use("/api", weekCategoryRoutes);
 app.use("/api", courseModuleRoutes);
 app.use("/api", commentRoutes);
