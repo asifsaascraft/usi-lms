@@ -114,7 +114,7 @@ export const getMyFeedbackByWebinar = async (req, res) => {
 
 /**
  * ==========================================
- * GET All Submitted Feedbacks (Admin only)
+ * GET All Submitted Feedbacks (public)
  * ==========================================
  */
 export const getAllSubmitFeedbacksByWebinar = async (req, res) => {
@@ -122,6 +122,7 @@ export const getAllSubmitFeedbacksByWebinar = async (req, res) => {
     const { webinarId } = req.params;
 
     const feedbacks = await SendFeedback.find({ webinarId })
+      .populate("webinarId", "name webinarType")
       .populate("userId", "name email mobile profilePicture")
       .sort({ createdAt: -1 });
 

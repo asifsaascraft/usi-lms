@@ -33,12 +33,10 @@ router.get(
 
 
 /**
- * Admin views all submitted feedbacks
+ * views all submitted feedbacks (public)
  */
 router.get(
   "/webinars/:webinarId/send-feedback",
-  protect,
-  authorizeRoles("admin"),
   getAllSubmitFeedbacksByWebinar
 );
 
