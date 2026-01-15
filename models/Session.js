@@ -11,6 +11,11 @@ const SessionSchema = new mongoose.Schema(
       type: String,
       required: [true, "Session Name is required"],
     },
+    chairperson: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Speaker",
+      required: [true, "Chairperson Name is required"],
+    }],
     sessionDate: {
       type: String, // Format: DD/MM/YYYY
       required: [true, "Session Date is required"],
@@ -32,9 +37,6 @@ const SessionSchema = new mongoose.Schema(
     endTime: {
       type: String, // Format: hh:mm A (e.g., 05:00 PM)
       required: [true, "End Time is required"],
-    },
-    description: {
-      type: String,
     },
   },
   { timestamps: true }

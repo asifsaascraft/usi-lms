@@ -3,6 +3,8 @@ import Session from "../models/Session.js";
 import Conference from "../models/Conference.js";
 import Hall from "../models/Hall.js";
 import Track from "../models/Track.js";
+import Speaker from "../models/Speaker.js";
+
 
 // =======================
 // Create Session (admin)
@@ -12,12 +14,12 @@ export const createSession = async (req, res) => {
     const { conferenceId } = req.params;
     const {
       sessionName,
+      chairperson,
       sessionDate,
       hallId,
       trackId,
       startTime,
       endTime,
-      description,
     } = req.body;
 
     // Validate conference
@@ -50,12 +52,12 @@ export const createSession = async (req, res) => {
     const session = await Session.create({
       conferenceId,
       sessionName,
+      chairperson,
       sessionDate,
       hallId,
       trackId,
       startTime,
       endTime,
-      description,
     });
 
     res.status(201).json({
@@ -82,6 +84,10 @@ export const getSessionsByConference = async (req, res) => {
       .populate("conferenceId")
       .populate("hallId")
       .populate("trackId")
+      .populate({
+        path: "chairperson",
+        select: "prefix speakerName",
+      })
       .sort({ sessionDate: 1, startTime: 1 });
 
     res.json({
@@ -111,6 +117,10 @@ export const getSessionsByDate = async (req, res) => {
     })
       .populate("hallId")
       .populate("trackId")
+      .populate({
+        path: "chairperson",
+        select: "prefix speakerName",
+      })
       .sort({ startTime: 1 });
 
     res.json({
