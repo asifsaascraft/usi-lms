@@ -17,6 +17,7 @@ export const createTopic = async (req, res) => {
       startTime,
       endTime,
       videoLink,
+      description,
       speakerId,
       moderator,
       panelist,
@@ -84,6 +85,7 @@ export const createTopic = async (req, res) => {
       startTime,
       endTime,
       videoLink,
+      description,
       speakerId,
       moderator,
       panelist,
@@ -192,11 +194,38 @@ export const getTopicsByConference = async (req, res) => {
       .populate("conferenceId")
       .populate({
         path: "sessionId",
-        populate: {
-          path: "hallId", //  populate hall details
-        },
+        populate: [
+          {
+            path: "hallId",
+            select: "hallName",
+          },
+          {
+            path: "trackId",
+            select: "trackName",
+          },
+          {
+            path: "chairperson",
+            select: "prefix speakerName",
+          },
+        ],
       })
       .populate("speakerId")
+      .populate({
+        path: "moderator",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "panelist",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "quizMaster",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "teamMember",
+        select: "prefix speakerName",
+      })
       .sort({ startTime: 1 });
 
     res.json({
@@ -224,11 +253,38 @@ export const getTopicsByConferenceBySession = async (req, res) => {
       .populate("conferenceId")
       .populate({
         path: "sessionId",
-        populate: {
-          path: "hallId", //  populate hall details
-        },
+        populate: [
+          {
+            path: "hallId",
+            select: "hallName",
+          },
+          {
+            path: "trackId",
+            select: "trackName",
+          },
+          {
+            path: "chairperson",
+            select: "prefix speakerName",
+          },
+        ],
       })
       .populate("speakerId")
+      .populate({
+        path: "moderator",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "panelist",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "quizMaster",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "teamMember",
+        select: "prefix speakerName",
+      })
       .sort({ startTime: 1 });
 
     res.json({

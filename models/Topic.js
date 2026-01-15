@@ -33,24 +33,30 @@ const TopicSchema = new mongoose.Schema(
       type: String,
       required: [true, "Video Link is required"],
     },
-
+    description: {
+      type: String,
+    },
     //Optional Part (Only required according to topic type)
     speakerId: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
     }],
     moderator: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Speaker",
     },
-    panelist: {
-      type: [String],
-    },
+    panelist: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Speaker",
+    }],
     quizMaster: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Speaker",
     },
-    teamMember: {
-      type: [String],
-    },
+    teamMember: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Speaker",
+    }],
   },
   { timestamps: true }
 );
