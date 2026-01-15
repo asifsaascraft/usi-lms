@@ -2,7 +2,7 @@ import axios from "axios";
 
 const sendOtpSMS = async (mobile, otp) => {
   try {
-    const message = `Login OTP for USI is ${otp}. Do not share this OTP to anyone for security reasons. - SaaScraft Studio`;
+    const message = `Login OTP for USI LMS is ${otp}. Do not share this OTP to anyone for security reasons. - SaaScraft Studio`;
 
     const params = {
       APIKey: process.env.SMS_GATEWAY_API_KEY,

@@ -190,7 +190,12 @@ export const getTopicsByConference = async (req, res) => {
 
     const topics = await Topic.find({ conferenceId })
       .populate("conferenceId")
-      .populate("sessionId")
+      .populate({
+        path: "sessionId",
+        populate: {
+          path: "hallId", //  populate hall details
+        },
+      })
       .populate("speakerId")
       .sort({ startTime: 1 });
 
@@ -217,7 +222,12 @@ export const getTopicsByConferenceBySession = async (req, res) => {
 
     const topics = await Topic.find({ conferenceId, sessionId })
       .populate("conferenceId")
-      .populate("sessionId")
+      .populate({
+        path: "sessionId",
+        populate: {
+          path: "hallId", //  populate hall details
+        },
+      })
       .populate("speakerId")
       .sort({ startTime: 1 });
 

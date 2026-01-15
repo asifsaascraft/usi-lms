@@ -31,6 +31,7 @@ const UserSchema = new mongoose.Schema(
     },
     affiliation: {
       type: String,
+      
       trim: true,
     },
     country: {
