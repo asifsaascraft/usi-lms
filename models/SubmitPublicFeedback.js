@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const SendFeedbackSchema = new mongoose.Schema(
+const SubmitPublicFeedbackSchema = new mongoose.Schema(
   {
     webinarId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -8,13 +8,16 @@ const SendFeedbackSchema = new mongoose.Schema(
       required: true,
     },
     
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
     },
   
-    sendFeedbacks: [
+    submitPublicFeedbacks: [
       {
         feedbackId: {
           type: mongoose.Schema.Types.ObjectId,
@@ -40,5 +43,5 @@ const SendFeedbackSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.SendFeedback ||
-  mongoose.model("SendFeedback", SendFeedbackSchema);
+export default mongoose.models.SubmitPublicFeedback ||
+  mongoose.model("SubmitPublicFeedback", SubmitPublicFeedbackSchema);

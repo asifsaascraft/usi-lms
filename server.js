@@ -35,6 +35,7 @@ import moduleCommentRoutes from "./routes/moduleCommentRoutes.js";
 import askedQAndARoutes from "./routes/askedQAndARoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import sendFeedbackRoutes from "./routes/sendFeedbackRoutes.js";
+import submitPublicFeedbackRoutes from "./routes/submitPublicFeedbackRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import submitQuizRoutes from "./routes/submitQuizRoutes.js";
 
@@ -102,6 +103,7 @@ app.use("/api", moduleCommentRoutes);
 app.use("/api", askedQAndARoutes);
 app.use("/api", feedbackRoutes);
 app.use("/api", sendFeedbackRoutes);
+app.use("/api", submitPublicFeedbackRoutes);
 app.use("/api", quizRoutes);
 app.use("/api", submitQuizRoutes);
 
