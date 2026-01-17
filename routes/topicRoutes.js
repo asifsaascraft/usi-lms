@@ -6,6 +6,7 @@ import {
   deleteTopic,
   getTopicsByConference,
   getTopicsByConferenceBySession,
+  getTopicById,
 } from "../controllers/topicController.js";
 
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
@@ -50,6 +51,12 @@ router.get(
 router.get(
   "/conferences/:conferenceId/sessions/:sessionId/topics",
   getTopicsByConferenceBySession
+);
+
+// Get topic by topic ID
+router.get(
+  "/topics/:id",
+  getTopicById
 );
 
 export default router;

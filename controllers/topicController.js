@@ -300,3 +300,61 @@ export const getTopicsByConferenceBySession = async (req, res) => {
     });
   }
 };
+
+// =======================
+// Get Topic by ID
+// =======================
+export const getTopicById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const topic = await Topic.findById(id)
+      .populate("conferenceId")
+      .populate({
+        path: "sessionId",
+        populate: [
+          { path: "hallId", select: "hallName" },
+          { path: "trackId", select: "trackName" },
+          { path: "chairperson", select: "prefix speakerName" },
+        ],
+      })
+      .populate({
+        path: "speakerId",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "moderator",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "panelist",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "quizMaster",
+        select: "prefix speakerName",
+      })
+      .populate({
+        path: "teamMember",
+        select: "prefix speakerName",
+      });
+
+    if (!topic) {
+      return res.status(404).json({
+        success: false,
+        message: "Topic not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: topic,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch topic",
+      error: error.message,
+    });
+  }
+};
