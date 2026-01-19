@@ -102,17 +102,17 @@ export const refreshAccessToken = async (req, res) => {
       return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
     }
 
-    const user = await User.findById(decoded.id)
-    if (!user) {
-      return res.status(401).json({ message: 'USER_NOT_FOUND' })
+    const admin  = await User.findById(decoded.id)
+    if (!admin ) {
+      return res.status(401).json({ message: 'ADMIN_NOT_FOUND' })
     }
 
     // (ADMIN ROLE CHECK)
-    if (user.role !== 'admin') {
+    if (admin.role !== 'admin') {
       return res.status(403).json({ message: 'NOT_ADMIN_TOKEN' })
     }
 
-    const { accessToken } = generateTokens(user._id, user.role)
+    const { accessToken } = generateTokens(admin._id, admin.role)
 
     const isProd = process.env.NODE_ENV === 'production'
 
