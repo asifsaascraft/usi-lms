@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import User from "../models/User.js";
 import { generateTokens } from "../utils/generateTokens.js";
-import sendEmailWithTemplate from "../utils/sendEmail.js"; 
+import sendEmailWithTemplate from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken"; // fixed import for refreshAccessToken
 
 // =======================
@@ -27,7 +27,7 @@ export const registerAdmin = async (req, res) => {
       country,
       password,
       role: "admin",
-      status: "Approved", 
+      status: "Approved",
     });
 
     res.status(201).json({ message: "Admin created successfully" });
@@ -52,13 +52,25 @@ export const loginAdmin = async (req, res) => {
     // Generate tokens
     const { accessToken, refreshToken } = generateTokens(admin._id, admin.role);
 
-    // Store refresh token in cookie
-    res.cookie("refreshToken", refreshToken, {
+    const isProd = process.env.NODE_ENV === 'production'
+
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+      //maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 1 * 60 * 1000, //  1 minute
+    })
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+      //maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 5 * 60 * 1000, //  5 minutes
+    })
 
     res.json({
       message: "Admin login successful",
@@ -80,28 +92,42 @@ export const loginAdmin = async (req, res) => {
 // =======================
 export const refreshAccessToken = async (req, res) => {
   try {
-    const token = req.cookies.refreshToken;
-    if (!token) return res.status(401).json({ message: "No refresh token" });
+    const token = req.cookies.refreshToken
+    if (!token) {
+      return res.status(401).json({ message: 'NO_REFRESH_TOKEN' })
+    }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
 
-    const user = await User.findById(decoded.id);
-    if (!user) return res.status(401).json({ message: "User not found" });
+    //  ADD THIS
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
+    }
 
-    const { accessToken, refreshToken } = generateTokens(user._id, user.role);
+    const user = await User.findById(decoded.id)
+    if (!user) {
+      return res.status(401).json({ message: 'USER_NOT_FOUND' })
+    }
 
-    // Update cookie with new refresh token
-    res.cookie("refreshToken", refreshToken, {
+    const { accessToken } = generateTokens(user._id, user.role)
+
+    const isProd = process.env.NODE_ENV === 'production'
+
+    //  FIX cookie expiry (see next section)
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+      //maxAge: 24 * 60 * 60 * 1000, // 1 day (matches JWT_EXPIRES)
+      maxAge: 1 * 60 * 1000, //  1 minute
+    })
 
-    res.json({ accessToken });
-  } catch (error) {
-    res.status(401).json({ message: "Invalid refresh token" });
+    res.json({ success: true })
+  } catch (err) {
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
+    return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
   }
 };
 
@@ -109,8 +135,23 @@ export const refreshAccessToken = async (req, res) => {
 // Logout Admin
 // =======================
 export const logoutAdmin = (req, res) => {
-  res.clearCookie("refreshToken");
-  res.json({ message: "Logged out successfully" });
+  const isProd = process.env.NODE_ENV === 'production'
+
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+  })
+
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+  })
+
+  res.json({ message: 'Logged out successfully' })
 };
 
 // =======================
@@ -139,7 +180,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmailWithTemplate({
       to: admin.email,
       name: admin.name,
-      templateKey: "2518b.554b0da719bc314.k1.6f29f192-dd74-11f0-91a1-621740bce2a6.19b3aa21729", 
+      templateKey: "2518b.554b0da719bc314.k1.6f29f192-dd74-11f0-91a1-621740bce2a6.19b3aa21729",
       mergeInfo: {
         name: admin.name,
         password_reset_link: resetUrl,

@@ -26,15 +26,10 @@ router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 
 // Refresh access token (GET, using cookies)
-router.get("/refresh-token", refreshAccessToken);
+router.post("/refresh-token", refreshAccessToken);
 
 // Logout - Admin only
-router.post(
-  "/logout",
-  protect, // ensures user is logged in
-  authorizeRoles("admin"), // admin-only
-  logoutAdmin
-);
+router.post("/logout", logoutAdmin);
 
 // Forgot Password
 router.post("/forgot-password", forgotPassword);

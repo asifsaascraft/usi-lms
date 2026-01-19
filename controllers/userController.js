@@ -66,7 +66,7 @@ export const registerUser = async (req, res) => {
             name: user.name,
             email: user.email,
             mobile: user.mobile,
-            qualification: user.qualification,
+            qualification: user.qualification || "NA",
             affiliation: user.affiliation || "N/A",
             country: user.country,
           },
@@ -295,6 +295,10 @@ export const verifyLoginOtp = async (req, res) => {
 //     res.status(401).json({ message: "Invalid refresh token" });
 //   }
 // };
+
+// =======================
+// Refresh Access Token
+// =======================
 export const refreshAccessTokenUser = async (req, res) => {
   try {
     const token = req.cookies.refreshToken
@@ -330,6 +334,8 @@ export const refreshAccessTokenUser = async (req, res) => {
 
     res.json({ success: true })
   } catch (err) {
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
     return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
   }
 }
