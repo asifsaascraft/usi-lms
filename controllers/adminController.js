@@ -59,8 +59,7 @@ export const loginAdmin = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 24 * 60 * 60 * 1000, // 1 day
-      maxAge: 1 * 60 * 1000, //  1 minute
+      maxAge: 15 * 60 * 1000, //  15 minutes
     })
 
     res.cookie('refreshToken', refreshToken, {
@@ -68,8 +67,7 @@ export const loginAdmin = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      maxAge: 5 * 60 * 1000, //  5 minutes
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     })
 
     res.json({
@@ -109,6 +107,11 @@ export const refreshAccessToken = async (req, res) => {
       return res.status(401).json({ message: 'USER_NOT_FOUND' })
     }
 
+    // (ADMIN ROLE CHECK)
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'NOT_ADMIN_TOKEN' })
+    }
+
     const { accessToken } = generateTokens(user._id, user.role)
 
     const isProd = process.env.NODE_ENV === 'production'
@@ -119,8 +122,7 @@ export const refreshAccessToken = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 24 * 60 * 60 * 1000, // 1 day (matches JWT_EXPIRES)
-      maxAge: 1 * 60 * 1000, //  1 minute
+      maxAge: 15 * 60 * 1000, // 15 minutes
     })
 
     res.json({ success: true })

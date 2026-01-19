@@ -217,16 +217,6 @@ export const verifyLoginOtp = async (req, res) => {
     user.loginOtpExpires = null;
     await user.save();
 
-    //  Generate tokens
-    // const { accessToken, refreshToken } = generateTokens(user._id, user.role);
-
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "none",
-    //   maxAge: 7 * 24 * 60 * 60 * 1000,
-    // });
-
     const { accessToken, refreshToken } = generateTokens(user._id, user.role)
 
     const isProd = process.env.NODE_ENV === 'production'
@@ -236,8 +226,7 @@ export const verifyLoginOtp = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 24 * 60 * 60 * 1000, // 1 day
-      maxAge: 1 * 60 * 1000, //  1 minute
+      maxAge: 15 * 60 * 1000, // 15 minutes
     })
 
     res.cookie('refreshToken', refreshToken, {
@@ -245,8 +234,7 @@ export const verifyLoginOtp = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      maxAge: 5 * 60 * 1000, //  5 minutes
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     })
 
 
@@ -270,35 +258,6 @@ export const verifyLoginOtp = async (req, res) => {
 // =======================
 // Refresh Access Token
 // =======================
-// export const refreshAccessTokenUser = async (req, res) => {
-//   try {
-//     const token = req.cookies.refreshToken;
-//     if (!token) return res.status(401).json({ message: "No refresh token" });
-
-//     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-
-//     const user = await User.findById(decoded.id);
-//     if (!user) return res.status(401).json({ message: "User not found" });
-
-//     const { accessToken, refreshToken } = generateTokens(user._id, user.role);
-
-//     res.cookie("refreshToken", refreshToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "none",
-//       maxAge: 7 * 24 * 60 * 60 * 1000,
-//     });
-
-//     res.json({ accessToken });
-//   } catch (error) {
-//     console.error("Refresh token error:", error);
-//     res.status(401).json({ message: "Invalid refresh token" });
-//   }
-// };
-
-// =======================
-// Refresh Access Token
-// =======================
 export const refreshAccessTokenUser = async (req, res) => {
   try {
     const token = req.cookies.refreshToken
@@ -317,6 +276,10 @@ export const refreshAccessTokenUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'USER_NOT_FOUND' })
     }
+    // (USER ROLE CHECK)
+    if (user.role !== 'user') {
+      return res.status(403).json({ message: 'NOT_USER_TOKEN' })
+    }
 
     const { accessToken } = generateTokens(user._id, user.role)
 
@@ -328,8 +291,7 @@ export const refreshAccessTokenUser = async (req, res) => {
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
-      //maxAge: 24 * 60 * 60 * 1000, // 1 day (matches JWT_EXPIRES)
-      maxAge: 1 * 60 * 1000, //  1 minute
+      maxAge: 15 * 60 * 1000, // 15 minutes
     })
 
     res.json({ success: true })
