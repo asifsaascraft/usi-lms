@@ -237,7 +237,7 @@ export const verifyLoginOtp = async (req, res) => {
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
       //maxAge: 24 * 60 * 60 * 1000, // 1 day
-      maxAge: 1 * 60 * 1000, // 🔥 1 minute
+      maxAge: 1 * 60 * 1000, //  1 minute
     })
 
     res.cookie('refreshToken', refreshToken, {
@@ -246,7 +246,7 @@ export const verifyLoginOtp = async (req, res) => {
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
       //maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      maxAge: 5 * 60 * 1000, // 🔥 5 minutes
+      maxAge: 5 * 60 * 1000, //  5 minutes
     })
 
 
@@ -304,7 +304,7 @@ export const refreshAccessTokenUser = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
 
-    // 🔥 ADD THIS
+    //  ADD THIS
     if (decoded.type !== 'refresh') {
       return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
     }
@@ -318,14 +318,14 @@ export const refreshAccessTokenUser = async (req, res) => {
 
     const isProd = process.env.NODE_ENV === 'production'
 
-    // 🔥 FIX cookie expiry (see next section)
+    //  FIX cookie expiry (see next section)
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
       path: '/',
       //maxAge: 24 * 60 * 60 * 1000, // 1 day (matches JWT_EXPIRES)
-      maxAge: 1 * 60 * 1000, // 🔥 1 minute
+      maxAge: 1 * 60 * 1000, //  1 minute
     })
 
     res.json({ success: true })
@@ -386,11 +386,8 @@ export const updateUserProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const fields = [
-      "name",
-      "prefix",
       "qualification",
       "affiliation",
-      "mobile",
       "country",
       "city",
       "state",

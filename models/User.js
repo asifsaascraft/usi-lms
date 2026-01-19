@@ -26,12 +26,10 @@ const UserSchema = new mongoose.Schema(
     },
     qualification: {
       type: String,
-      required: [true, "Qualification is required"],
       trim: true,
     },
     affiliation: {
       type: String,
-      
       trim: true,
     },
     country: {
