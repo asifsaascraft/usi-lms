@@ -2,8 +2,9 @@
 import express from "express";
 import {
   getWebinars,
-  getActiveWebinarById,
   getActiveWebinars,
+  getUpcomingWebinars,
+  getActiveWebinarById,
   getActiveUSIWebinars,
   getActiveSmartLearningWebinars,
   getActiveLiveWorkshops,
@@ -23,6 +24,9 @@ router.get("/webinars", getWebinars);
 
 // Public: Get all active webinars
 router.get("/webinars/active", getActiveWebinars);
+
+// Public: Get Upcoming Webinars (All Types, Active only)
+router.get("/webinars/upcoming", getUpcomingWebinars);
 
 // Public: Get active webinar BY ID
 router.get("/webinars/active/:id", getActiveWebinarById);
