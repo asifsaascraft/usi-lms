@@ -4,11 +4,8 @@ export const getCookieOptions = () => {
 
   return {
     httpOnly: true,
-    secure: isProd,                 // HTTPS required in prod
-    sameSite: isProd ? 'none' : 'lax',
+    secure: true,                 // HTTPS required in prod
+    sameSite: 'none',
     path: '/',
-    ...(isProd && process.env.COOKIE_DOMAIN
-      ? { domain: process.env.COOKIE_DOMAIN }
-      : {}),
   }
 }
