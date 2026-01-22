@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getUserSession,
   registerUser,
   loginUser,
   verifyLoginOtp,
@@ -21,6 +22,14 @@ const router = express.Router();
 // =======================
 // User Routes
 // =======================
+
+//  GET CURRENT USER SESSION (Protected)
+router.get(
+  "/me",
+  protect,                // verifies access token
+  authorizeRoles("user"),
+  getUserSession 
+);
 
 // Public signup
 router.post("/register", registerUser);

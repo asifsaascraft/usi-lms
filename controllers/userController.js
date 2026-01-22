@@ -6,6 +6,47 @@ import sendOtpSMS from "../utils/sendOtpSMS.js";
 import crypto from "crypto";
 import { getCookieOptions } from "../utils/cookieOptions.js";
 
+/* =========================
+   GET CURRENT USER SESSION
+========================= */
+export const getUserSession = async (req, res) => {
+  try {
+    res.setHeader('Cache-Control', 'no-store')
+
+    const token = req.cookies.accessToken
+    if (!token) {
+      return res.status(401).json({ authenticated: false })
+    }
+
+    let decoded
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET)
+    } catch {
+      return res.status(401).json({ authenticated: false })
+    }
+
+    if (decoded.type !== 'access') {
+      return res.status(401).json({ authenticated: false })
+    }
+
+    const user = await User.findById(decoded.id).select(
+      '-password -passwordResetToken -passwordResetExpires'
+    )
+
+    if (!user || user.role !== 'user') {
+      return res.status(401).json({ authenticated: false })
+    }
+
+    res.json({
+      authenticated: true,
+      user,
+    })
+  } catch (error) {
+    res.status(500).json({ authenticated: false })
+  }
+}
+
+
 // =======================
 // User Signup (Public)
 // =======================
