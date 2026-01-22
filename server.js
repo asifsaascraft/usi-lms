@@ -47,8 +47,8 @@ const app = express();
 // CORS setup for multiple frontends
 // =======================
 const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3001",
+  "https://localhost:3000",
+  "https://localhost:3001",
   process.env.ADMIN_FRONTEND_URL,
   process.env.USER_FRONTEND_URL,
 ];
