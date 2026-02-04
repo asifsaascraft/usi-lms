@@ -2,18 +2,39 @@ import express from "express";
 import {
   createSupportMessage,
   getAllSupportMessages,
+  resolveSupportMessage,
+  replySupportMessage,
+  deleteSupportMessage,
 } from "../controllers/supportController.js";
 
 const router = express.Router();
 
 // =======================
-// Support Routes (Public)
+// Support Routes
 // =======================
 
-// Create support message
+// Public – Submit support query
 router.post("/support-message", createSupportMessage);
 
-// Get all support messages
-router.get("/all-support-message", getAllSupportMessages);
+// Admin – Get all / filter by status
+router.get("/support-message", getAllSupportMessages);
+
+// Admin – Resolve ticket
+router.patch(
+  "/support-message/:id/resolve",
+  resolveSupportMessage
+);
+
+// Admin – Reply via email
+router.post(
+  "/support-message/:id/reply",
+  replySupportMessage
+);
+
+// Admin – Hard delete ticket
+router.delete(
+  "/support-message/:id",
+  deleteSupportMessage
+);
 
 export default router;
