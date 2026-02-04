@@ -11,41 +11,40 @@ import { getCookieOptions } from "../utils/cookieOptions.js";
 ========================= */
 export const getUserSession = async (req, res) => {
   try {
-    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader("Cache-Control", "no-store");
 
-    const token = req.cookies.accessToken
+    const token = req.cookies.accessToken;
     if (!token) {
-      return res.status(401).json({ authenticated: false })
+      return res.status(401).json({ authenticated: false });
     }
 
-    let decoded
+    let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET)
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch {
-      return res.status(401).json({ authenticated: false })
+      return res.status(401).json({ authenticated: false });
     }
 
-    if (decoded.type !== 'access') {
-      return res.status(401).json({ authenticated: false })
+    if (decoded.type !== "access") {
+      return res.status(401).json({ authenticated: false });
     }
 
     const user = await User.findById(decoded.id).select(
-      '-password -passwordResetToken -passwordResetExpires'
-    )
+      "-password -passwordResetToken -passwordResetExpires",
+    );
 
-    if (!user || user.role !== 'user') {
-      return res.status(401).json({ authenticated: false })
+    if (!user || user.role !== "user") {
+      return res.status(401).json({ authenticated: false });
     }
 
     res.json({
       authenticated: true,
       user,
-    })
+    });
   } catch (error) {
-    res.status(500).json({ authenticated: false })
+    res.status(500).json({ authenticated: false });
   }
-}
-
+};
 
 // =======================
 // User Signup (Public)
@@ -236,7 +235,7 @@ export const loginUser = async (req, res) => {
 // =======================
 export const verifyLoginOtp = async (req, res) => {
   try {
-    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader("Cache-Control", "no-store");
 
     const { userId, otp } = req.body;
 
@@ -261,18 +260,17 @@ export const verifyLoginOtp = async (req, res) => {
     user.loginOtpExpires = null;
     await user.save();
 
-    const { accessToken, refreshToken } = generateTokens(user._id, user.role)
+    const { accessToken, refreshToken } = generateTokens(user._id, user.role);
 
-    res.cookie('accessToken', accessToken, {
+    res.cookie("accessToken", accessToken, {
       ...getCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       ...getCookieOptions(),
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    })
-
+    });
 
     res.json({
       message: "Login successful",
@@ -295,66 +293,64 @@ export const verifyLoginOtp = async (req, res) => {
 // =======================
 export const refreshAccessTokenUser = async (req, res) => {
   try {
-    res.setHeader('Cache-Control', 'no-store')
-    const token = req.cookies.refreshToken
+    res.setHeader("Cache-Control", "no-store");
+    const token = req.cookies.refreshToken;
     if (!token) {
-      return res.status(401).json({ message: 'NO_REFRESH_TOKEN' })
+      return res.status(401).json({ message: "NO_REFRESH_TOKEN" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 
     //  ADD THIS
-    if (decoded.type !== 'refresh') {
-      return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
+    if (decoded.type !== "refresh") {
+      return res.status(401).json({ message: "INVALID_REFRESH_TOKEN" });
     }
 
-    const user = await User.findById(decoded.id)
+    const user = await User.findById(decoded.id);
     if (!user) {
-      return res.status(401).json({ message: 'USER_NOT_FOUND' })
+      return res.status(401).json({ message: "USER_NOT_FOUND" });
     }
     // (USER ROLE CHECK)
-    if (user.role !== 'user') {
-      return res.status(403).json({ message: 'NOT_USER_TOKEN' })
+    if (user.role !== "user") {
+      return res.status(403).json({ message: "NOT_USER_TOKEN" });
     }
 
-    const { accessToken } = generateTokens(user._id, user.role)
+    const { accessToken } = generateTokens(user._id, user.role);
 
     //  FIX cookie expiry (see next section)
-    res.cookie('accessToken', accessToken, {
+    res.cookie("accessToken", accessToken, {
       ...getCookieOptions(),
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
 
-    res.json({ success: true })
+    res.json({ success: true });
   } catch (err) {
-    res.clearCookie('accessToken', getCookieOptions())
-    res.clearCookie('refreshToken', getCookieOptions())
-    return res.status(401).json({ message: 'INVALID_REFRESH_TOKEN' })
+    res.clearCookie("accessToken", getCookieOptions());
+    res.clearCookie("refreshToken", getCookieOptions());
+    return res.status(401).json({ message: "INVALID_REFRESH_TOKEN" });
   }
-}
-
+};
 
 // =======================
 // Logout User
 // =======================
 export const logoutUser = (req, res) => {
-  res.setHeader('Cache-Control', 'no-store')
+  res.setHeader("Cache-Control", "no-store");
 
-  res.clearCookie('accessToken', getCookieOptions())
-  res.clearCookie('refreshToken', getCookieOptions())
-  res.json({ message: 'Logged out successfully' })
-}
-
+  res.clearCookie("accessToken", getCookieOptions());
+  res.clearCookie("refreshToken", getCookieOptions());
+  res.json({ message: "Logged out successfully" });
+};
 
 // =======================
 // Get Profile
 // =======================
 export const getUserProfile = async (req, res) => {
   try {
-    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader("Cache-Control", "no-store");
 
     const user = await User.findById(req.user._id).select(
-      "-password -plainPassword -passwordResetToken -passwordResetExpires"
+      "-password -plainPassword -passwordResetToken -passwordResetExpires",
     );
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -392,14 +388,14 @@ export const updateUserProfile = async (req, res) => {
       // Delete old image from S3
       if (user.profilePicture) {
         const oldKey = user.profilePicture.split(
-          `${process.env.AWS_BUCKET_NAME}/`
+          `${process.env.AWS_BUCKET_NAME}/`,
         )[1];
         if (oldKey) {
           await s3.send(
             new DeleteObjectCommand({
               Bucket: process.env.AWS_BUCKET_NAME,
               Key: oldKey,
-            })
+            }),
           );
         }
       }
@@ -496,6 +492,65 @@ export const updateUserStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Update status error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// =======================
+// Delete User – Admin only
+// =======================
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Prevent admin from deleting himself (optional but recommended)
+    if (req.user._id.toString() === userId) {
+      return res.status(400).json({
+        message: "Admin cannot delete own account",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Ensure only USER accounts can be deleted
+    if (user.role !== "user") {
+      return res.status(403).json({
+        message: "Only user accounts can be deleted",
+      });
+    }
+
+    // =======================
+    // Send Deletion Email
+    // =======================
+    try {
+      await sendEmailWithTemplate({
+        to: user.email,
+        name: user.name,
+        templateKey: "2518b.554b0da719bc314.k1.4ba14761-fce0-11f0-9f12-62df313bf14d.19c088e56d3",
+        mergeInfo: {
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile,
+        },
+      });
+    } catch (emailErr) {
+      console.error("Delete user email failed:", emailErr.message);
+    }
+
+    // Delete user after email attempt
+    await user.deleteOne();
+
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete user error:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };

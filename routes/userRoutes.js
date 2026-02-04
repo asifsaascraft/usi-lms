@@ -10,6 +10,7 @@ import {
   updateUserProfile,
   getAllUsers,
   updateUserStatus,
+  deleteUser,
 } from "../controllers/userController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 import { uploadUSIProfileImage } from "../middlewares/uploadMiddleware.js";
@@ -88,6 +89,14 @@ router.get(
   authorizeRoles("user"),
   getMyAllRegistrations
 );
+
+// Delete User – Admin only
+router.delete(
+  "/:userId",
+  protect,
+  authorizeRoles("admin"),
+  deleteUser
+)
 
 
 export default router;

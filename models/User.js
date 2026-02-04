@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema(
     },
     country: {
       type: String,
-      required: [true, "Country is required"],
+      //required: [true, "Country is required"],
       trim: true,
     },
     role: {
