@@ -172,7 +172,7 @@ export const getRegistrationsByCourse = async (req, res) => {
     }
 
     const registrations = await CourseRegistration.find({ courseId })
-      .populate("userId", "name email mobile membershipNumber")
+      .populate("userId", "name email mobile prefix")
       .sort({ createdAt: -1 });
 
     return res.json({
@@ -180,14 +180,12 @@ export const getRegistrationsByCourse = async (req, res) => {
       course: {
         id: course._id,
         courseName: course.courseName,
-        startDate: course.startDate,
-        endDate: course.endDate,
       },
       total: registrations.length,
       data: registrations.map((r) => ({
         registrationId: r._id,
-        user: r.userId,
         registeredOn: r.createdAt,
+        user: r.userId,
       })),
     });
   } catch (error) {

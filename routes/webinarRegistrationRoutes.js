@@ -2,6 +2,7 @@ import express from "express";
 import {
   registerToWebinar,
   getUserWebinarRegistrations,
+  getWebinarRegistrationsForAdminSimple,
   getAllWebinarRegistrations,
   getAttendedUsers,
   getNotAttendedUsers,
@@ -25,6 +26,15 @@ router.get(
   protect,
   authorizeRoles("user"),
   getUserWebinarRegistrations
+);
+
+// Admin
+// Get all registrations for particular Webinar Simple response
+router.get(
+  "/admin/webinar/:webinarId/registrations-simple",
+  protect,
+  authorizeRoles("admin"),
+  getWebinarRegistrationsForAdminSimple
 );
 
 // Admin

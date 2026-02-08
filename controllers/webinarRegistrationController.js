@@ -157,6 +157,50 @@ export const getUserWebinarRegistrations = async (req, res) => {
   }
 };
 
+// ==============================
+// Admin → Simple list of registrations of a webinar
+// ==============================
+export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
+  try {
+    const { webinarId } = req.params;
+
+    // Validate webinar
+    const webinar = await Webinar.findById(webinarId);
+    if (!webinar) {
+      return res.status(404).json({
+        success: false,
+        message: "Webinar not found",
+      });
+    }
+
+    const registrations = await WebinarRegistration.find({ webinarId })
+      .populate("userId", "name email mobile prefix")
+      .sort({ createdAt: -1 });
+
+    return res.json({
+      success: true,
+      webinar: {
+        id: webinar._id,
+        name: webinar.name,
+      },
+      total: registrations.length,
+      data: registrations.map((r) => ({
+        registrationId: r._id,
+        registeredOn: r.createdAt,
+        user: r.userId,
+        email: r.email,
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch registrations",
+      error: error.message,
+    });
+  }
+};
+
+
 /**
  * =====================================================
  * ADMIN: Get ALL registrations (attended + not attended) for particular Webinar

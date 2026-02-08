@@ -172,7 +172,7 @@ export const getConferenceRegistrationsForAdmin = async (req, res) => {
     }
 
     const registrations = await ConferenceRegistration.find({ conferenceId })
-      .populate("userId", "name email mobile membershipNumber")
+      .populate("userId", "name email mobile prefix")
       .sort({ createdAt: -1 });
 
     return res.json({
@@ -180,9 +180,6 @@ export const getConferenceRegistrationsForAdmin = async (req, res) => {
       conference: {
         id: conference._id,
         name: conference.name,
-        startDate: conference.startDate,
-        endDate: conference.endDate,
-        venueName: conference.venueName,
       },
       total: registrations.length,
       data: registrations.map((r) => ({
@@ -190,8 +187,6 @@ export const getConferenceRegistrationsForAdmin = async (req, res) => {
         registeredOn: r.createdAt,
         user: r.userId,
         email: r.email,
-        mobile: r.mobile,
-        membershipNumber: r.membershipNumber,
       })),
     });
   } catch (error) {
