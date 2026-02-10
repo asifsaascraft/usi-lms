@@ -28,7 +28,10 @@ export const createFeedback = async (req, res) => {
 
     const feedback = await Feedback.create({
       webinarId,
-      ...req.body,
+      participantFields: req.body.participantFields || [],
+      feedbacks: req.body.feedbacks || [],
+      openEnded: req.body.openEnded || [],
+      closeNote: req.body.closeNote || "",
     });
 
     res.status(201).json({
@@ -54,11 +57,11 @@ export const getFeedbackByWebinar = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
-    const feedback = await Feedback.findOne({ webinarId })
-          .populate(
-            "webinarId",
-            "name webinarType startDate endDate startTime endTime timeZone"
-          );
+    const feedback = await Feedback.findOne({ webinarId }).populate(
+      "webinarId",
+      "name webinarType startDate endDate startTime endTime timeZone"
+    );
+
     res.json({
       success: true,
       data: feedback || null,
@@ -89,7 +92,19 @@ export const updateFeedback = async (req, res) => {
       });
     }
 
-    Object.assign(feedback, req.body);
+    // update only what comes
+    if (req.body.participantFields !== undefined)
+      feedback.participantFields = req.body.participantFields;
+
+    if (req.body.feedbacks !== undefined)
+      feedback.feedbacks = req.body.feedbacks;
+
+    if (req.body.openEnded !== undefined)
+      feedback.openEnded = req.body.openEnded;
+
+    if (req.body.closeNote !== undefined)
+      feedback.closeNote = req.body.closeNote;
+
     await feedback.save();
 
     res.json({

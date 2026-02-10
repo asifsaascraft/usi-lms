@@ -16,11 +16,13 @@ const CheckboxOptionSchema = new mongoose.Schema(
 const ParticipantFieldSchema = new mongoose.Schema(
   {
     label: { type: String, default: "" },
+
     type: {
       type: String,
       enum: ["input", "checkbox"],
       required: true,
     },
+
     options: {
       type: [CheckboxOptionSchema],
       default: [],
@@ -30,7 +32,7 @@ const ParticipantFieldSchema = new mongoose.Schema(
 );
 
 /**
- * Feedback Question
+ *  Feedback Question (inside label)
  */
 const FeedbackItemSchema = new mongoose.Schema(
   {
@@ -44,6 +46,24 @@ const FeedbackItemSchema = new mongoose.Schema(
 
     options: {
       type: [String],
+      default: [],
+    },
+  },
+  { _id: false }
+);
+
+/**
+ *  Feedback Label → contains many questions
+ */
+const FeedbackLabelSchema = new mongoose.Schema(
+  {
+    feedbackLabelName: {
+      type: String,
+      default: "",
+    },
+
+    feedbackItems: {
+      type: [FeedbackItemSchema],
       default: [],
     },
   },
@@ -77,8 +97,9 @@ const FeedbackSchema = new mongoose.Schema(
       default: [],
     },
 
+    //  UPDATED STRUCTURE
     feedbacks: {
-      type: [FeedbackItemSchema],
+      type: [FeedbackLabelSchema],
       default: [],
     },
 
