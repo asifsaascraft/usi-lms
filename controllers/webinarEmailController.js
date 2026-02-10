@@ -219,7 +219,7 @@ export const sendJoinEmailToAllUsers = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
-    const loginUrl = "https://elearning.usi.org.in/login";
+    const loginUrl = "https://elearning.usi.org.in/upcoming";
 
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
@@ -283,7 +283,7 @@ export const sendJoinEmailToSingleUser = async (req, res) => {
   try {
     const { webinarId, userId } = req.params;
 
-    const loginUrl = "https://elearning.usi.org.in/login";
+    const loginUrl = "https://elearning.usi.org.in/upcoming";
 
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
