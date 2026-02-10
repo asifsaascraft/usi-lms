@@ -10,7 +10,13 @@ import Webinar from "../models/Webinar.js";
 export const submitPublicFeedback = async (req, res) => {
   try {
     const { webinarId } = req.params;
-    const { name, email, submitPublicFeedbacks, sendOtherFeedback } = req.body;
+
+    const {
+      participantAnswers,
+      sendFeedbacks,
+      openEndedAnswers,
+      sendOtherFeedback,
+    } = req.body;
 
     // Validate webinar
     const webinar = await Webinar.findById(webinarId);
@@ -21,7 +27,7 @@ export const submitPublicFeedback = async (req, res) => {
       });
     }
 
-    // Check admin feedback exists
+    // Check template exists
     const adminFeedback = await Feedback.findOne({ webinarId });
     if (!adminFeedback) {
       return res.status(400).json({
@@ -30,25 +36,12 @@ export const submitPublicFeedback = async (req, res) => {
       });
     }
 
-    // Prevent duplicate submission by email
-    const alreadySubmitted = await SubmitPublicFeedback.findOne({
-      webinarId,
-      email,
-    });
-
-    if (alreadySubmitted) {
-      return res.status(400).json({
-        success: false,
-        message: "Feedback already submitted with this email",
-      });
-    }
-
-    // Save public feedback
+    // Save
     const feedback = await SubmitPublicFeedback.create({
       webinarId,
-      name,
-      email,
-      submitPublicFeedbacks,
+      participantAnswers,
+      sendFeedbacks,
+      openEndedAnswers,
       sendOtherFeedback,
     });
 
@@ -75,7 +68,6 @@ export const getAllPublicFeedbacksByWebinar = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
-    // Validate webinar
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
       return res.status(404).json({

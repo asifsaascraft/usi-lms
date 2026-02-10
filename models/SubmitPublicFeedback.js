@@ -1,5 +1,16 @@
 import mongoose from "mongoose";
 
+/**
+ * Objective answers (scale / yes-no)
+ */
+const SubmittedFeedbackSchema = new mongoose.Schema(
+  {
+    feedbackName: { type: String },
+    selectedOption: { type: String },
+  },
+  { _id: false }
+);
+
 const SubmitPublicFeedbackSchema = new mongoose.Schema(
   {
     webinarId: {
@@ -7,37 +18,42 @@ const SubmitPublicFeedbackSchema = new mongoose.Schema(
       ref: "Webinar",
       required: true,
     },
-    
-    name: {
-      type: String,
-      required: [true, "Name is required"],
+
+    /**
+     * Participant fields dynamic
+     * ex:
+     * { Name: "Asif", Profession: "Doctor" }
+     */
+    participantAnswers: {
+      type: Map,
+      of: String,
+      default: {},
     },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
+
+    /**
+     * Objective answers
+     */
+    sendFeedbacks: {
+      type: [SubmittedFeedbackSchema],
+      default: [],
     },
-  
-    submitPublicFeedbacks: [
-      {
-        feedbackId: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: true, // refers to Feedback.feedbacks._id
-        },
 
-        feedbackName: {
-          type: String, // optional, for readability
-        },
+    /**
+     * Open ended answers
+     */
+    openEndedAnswers: {
+      type: Map,
+      of: String,
+      default: {},
+    },
 
-        selectedOption: {
-          type: String, // RADIO → single selected value
-          required: true,
-        },
-      },
-    ],
-
+    /**
+     * Additional comment
+     */
     sendOtherFeedback: {
       type: String,
       trim: true,
+      default: "",
     },
   },
   { timestamps: true }
