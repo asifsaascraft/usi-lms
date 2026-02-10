@@ -41,6 +41,7 @@ export const sendEmailToAttendedUsers = async (req, res) => {
         name: reg.userId.name,
         templateKey: "2518b.554b0da719bc314.k1.dd490c60-eec7-11f0-8e23-525400c92439.19bac2e2026",
         mergeInfo: {
+          prefix: reg.userId.prefix,
           name: reg.userId.name,
           webinar_name: webinar.name,
           webinar_date: webinar.startDate,
@@ -92,6 +93,7 @@ export const sendEmailToNotAttendedUsers = async (req, res) => {
         name: reg.userId.name,
         templateKey: "2518b.554b0da719bc314.k1.34297f10-eec8-11f0-8e23-525400c92439.19bac305981",
         mergeInfo: {
+          prefix: reg.userId.prefix,
           name: reg.userId.name,
           webinar_name: webinar.name,
           webinar_date: webinar.startDate,
@@ -147,6 +149,7 @@ export const sendEmailToSingleAttendedUser = async (req, res) => {
       name: registration.userId.name,
       templateKey: "2518b.554b0da719bc314.k1.dd490c60-eec7-11f0-8e23-525400c92439.19bac2e2026",
       mergeInfo: {
+        prefix: registration.userId.prefix,
         name: registration.userId.name,
         webinar_name: webinar.name,
         webinar_date: webinar.startDate,
@@ -194,6 +197,7 @@ export const sendEmailToSingleNotAttendedUser = async (req, res) => {
       name: registration.userId.name,
       templateKey: "2518b.554b0da719bc314.k1.34297f10-eec8-11f0-8e23-525400c92439.19bac305981",
       mergeInfo: {
+        prefix: registration.userId.prefix,
         name: registration.userId.name,
         webinar_name: webinar.name,
         webinar_date: webinar.startDate,
@@ -255,6 +259,7 @@ export const sendJoinEmailToAllUsers = async (req, res) => {
         templateKey:
           "2518b.554b0da719bc314.k1.13d78aa0-0588-11f1-8892-8e9a6c33ddc2.19c4147b04a",
         mergeInfo: {
+          prefix: reg.userId.prefix,
           name: reg.userId.name,
           webinar_name: webinar.name,
           webinar_date: webinar.startDate,
@@ -307,6 +312,7 @@ export const sendJoinEmailToSingleUser = async (req, res) => {
       templateKey:
         "2518b.554b0da719bc314.k1.13d78aa0-0588-11f1-8892-8e9a6c33ddc2.19c4147b04a",
       mergeInfo: {
+        prefix: reg.userId.prefix,
         name: registration.userId.name,
         webinar_name: webinar.name,
         webinar_date: webinar.startDate,
