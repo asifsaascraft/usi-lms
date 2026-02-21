@@ -86,7 +86,7 @@ export const registerUser = async (req, res) => {
       qualification,
       affiliation,
       country,
-      uploadDocument: req.file.location, 
+      uploadDocument: req.file.location,
       role: "user",
       status: "Pending",
     });
@@ -191,22 +191,29 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // =======================
-    // OTP Rate Limiting (ADD HERE)
-    // =======================
-    if (user.loginOtpExpires && user.loginOtpExpires > Date.now()) {
-      const waitSeconds = Math.ceil((user.loginOtpExpires - Date.now()) / 1000);
+    // Check resend cooldown (2 minutes)
+    if (user.loginOtpResendAfter && user.loginOtpResendAfter > Date.now()) {
+      const waitSeconds = Math.ceil(
+        (user.loginOtpResendAfter - Date.now()) / 1000
+      );
 
       return res.status(429).json({
-        message: `OTP already sent. Please wait ${waitSeconds} seconds before requesting a new OTP.`,
+        message: `Please wait ${waitSeconds} seconds before requesting a new OTP.`,
       });
     }
-    //  Generate 6 digit OTP
+
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Hash OTP
     user.loginOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
-    user.loginOtpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    // OTP expiry → 10 minutes
+    user.loginOtpExpires = Date.now() + 10 * 60 * 1000;
+
+    // Resend cooldown → 2 minutes
+    user.loginOtpResendAfter = Date.now() + 2 * 60 * 1000;
+
     await user.save({ validateBeforeSave: false });
 
     //  Send OTP Email
@@ -264,9 +271,11 @@ export const verifyLoginOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    // Clear OTP
+    // Clear OTP and resend cooldown
     user.loginOtp = null;
     user.loginOtpExpires = null;
+    user.loginOtpResendAfter = null;
+
     await user.save();
 
     const { accessToken, refreshToken } = generateTokens(user._id, user.role);

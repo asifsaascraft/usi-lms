@@ -61,8 +61,13 @@ const UserSchema = new mongoose.Schema(
     loginOtp: {
       type: String,
     },
+
     loginOtpExpires: {
-      type: Date,
+      type: Date, // OTP valid till (10 minutes)
+    },
+
+    loginOtpResendAfter: {
+      type: Date, // resend allowed after (2 minutes)
     },
     //  For forgot-password/reset-password
     passwordResetToken: {
