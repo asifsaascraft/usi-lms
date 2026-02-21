@@ -206,7 +206,7 @@ export const loginUser = async (req, res) => {
 
     user.loginOtp = crypto.createHash("sha256").update(otp).digest("hex");
 
-    user.loginOtpExpires = Date.now() + 2 * 60 * 1000; // 5 minutes
+    user.loginOtpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save({ validateBeforeSave: false });
 
     //  Send OTP Email
