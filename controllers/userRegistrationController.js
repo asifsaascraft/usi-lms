@@ -1,5 +1,6 @@
 import CourseRegistration from "../models/CourseRegistration.js";
 import WebinarRegistration from "../models/WebinarRegistration.js";
+import ConferenceRegistration from "../models/ConferenceRegistration.js";
 import User from "../models/User.js";
 
 export const getMyAllRegistrations = async (req, res) => {
@@ -11,7 +12,10 @@ export const getMyAllRegistrations = async (req, res) => {
     // ------------------------------------
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     // ------------------------------------
@@ -29,7 +33,14 @@ export const getMyAllRegistrations = async (req, res) => {
       .sort({ createdAt: -1 });
 
     // ------------------------------------
-    // Normalize response
+    // Fetch conference registrations
+    // ------------------------------------
+    const conferenceRegs = await ConferenceRegistration.find({ userId })
+      .populate("conferenceId")
+      .sort({ createdAt: -1 });
+
+    // ------------------------------------
+    // Normalize courses
     // ------------------------------------
     const courses = courseRegs.map((x) => ({
       registrationId: x._id,
@@ -41,10 +52,28 @@ export const getMyAllRegistrations = async (req, res) => {
       membershipNumber: x.membershipNumber,
     }));
 
+    // ------------------------------------
+    // Normalize webinars
+    // ------------------------------------
     const webinars = webinarRegs.map((x) => ({
       registrationId: x._id,
       type: "webinar",
       details: x.webinarId,
+      registeredOn: x.createdAt,
+      email: x.email,
+      mobile: x.mobile,
+      membershipNumber: x.membershipNumber,
+      attended: x.attended,
+      attendedAt: x.attendedAt,
+    }));
+
+    // ------------------------------------
+    // Normalize conferences
+    // ------------------------------------
+    const conferences = conferenceRegs.map((x) => ({
+      registrationId: x._id,
+      type: "conference",
+      details: x.conferenceId,
       registeredOn: x.createdAt,
       email: x.email,
       mobile: x.mobile,
@@ -54,10 +83,17 @@ export const getMyAllRegistrations = async (req, res) => {
     // ------------------------------------
     // Merge + sort by latest registration
     // ------------------------------------
-    const mergedRegistrations = [...courses, ...webinars].sort(
+    const mergedRegistrations = [
+      ...courses,
+      ...webinars,
+      ...conferences,
+    ].sort(
       (a, b) => new Date(b.registeredOn) - new Date(a.registeredOn)
     );
 
+    // ------------------------------------
+    // Final response
+    // ------------------------------------
     return res.status(200).json({
       success: true,
       user: {
@@ -68,10 +104,13 @@ export const getMyAllRegistrations = async (req, res) => {
       total: mergedRegistrations.length,
       coursesCount: courses.length,
       webinarsCount: webinars.length,
+      conferencesCount: conferences.length,
       data: mergedRegistrations,
     });
+
   } catch (error) {
     console.error("Get merged registrations error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to fetch registrations",
