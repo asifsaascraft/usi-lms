@@ -1,5 +1,6 @@
 // controllers/webinarController.js
 import Webinar from "../models/Webinar.js";
+import { getPagination, buildPaginationMeta } from "../utils/pagination.js";
 
 
 // =======================
@@ -7,12 +8,24 @@ import Webinar from "../models/Webinar.js";
 // =======================
 export const getWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find().sort({ createdAt: -1 });
+
+    const { page, limit, skip } = getPagination(req);
+
+    const total = await Webinar.countDocuments();
+
+    const webinars = await Webinar.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      pagination,
+      data: webinars.map(w => w.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -27,14 +40,26 @@ export const getWebinars = async (req, res) => {
 // =======================
 export const getActiveWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find({ status: "Active" }).sort({
-      createdAt: -1,
-    });
+
+    const { page, limit, skip } = getPagination(req);
+
+    const filter = { status: "Active" };
+
+    const total = await Webinar.countDocuments(filter);
+
+    const webinars = await Webinar.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      pagination,
+      data: webinars.map(w => w.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -49,21 +74,33 @@ export const getActiveWebinars = async (req, res) => {
 // =======================
 export const getUpcomingWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find({ status: "Active" }).sort({
-      createdAt: -1,
-    });
 
-    const result = webinars
-      .map((w) => w.toObject({ virtuals: true }))
+    const { page, limit } = getPagination(req);
+
+    const webinars = await Webinar.find({ status: "Active" })
+      .sort({ createdAt: -1 });
+
+    const filtered = webinars
+      .map(w => w.toObject({ virtuals: true }))
       .filter(
-        (w) => w.dynamicStatus === "Upcoming" || w.dynamicStatus === "Live"
+        w => w.dynamicStatus === "Upcoming" || w.dynamicStatus === "Live"
       );
+
+    const total = filtered.length;
+
+    const paginated = filtered.slice(
+      (page - 1) * limit,
+      page * limit
+    );
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      count: result.length,
-      data: result,
+      pagination,
+      data: paginated,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -107,15 +144,29 @@ export const getActiveWebinarById = async (req, res) => {
 // =======================
 export const getActiveUSIWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find({
+
+    const { page, limit, skip } = getPagination(req);
+
+    const filter = {
       webinarType: "USI Webinar",
       status: "Active",
-    }).sort({ createdAt: -1 });
+    };
+
+    const total = await Webinar.countDocuments(filter);
+
+    const webinars = await Webinar.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      pagination,
+      data: webinars.map(w => w.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -130,15 +181,27 @@ export const getActiveUSIWebinars = async (req, res) => {
 // =======================
 export const getActiveSmartLearningWebinars = async (req, res) => {
   try {
-    const webinars = await Webinar.find({
+    const { page, limit, skip } = getPagination(req);
+
+    const filter = {
       webinarType: "Smart Learning Program",
       status: "Active",
-    }).sort({ createdAt: -1 });
+    };
 
+    const total = await Webinar.countDocuments(filter);
+
+    const webinars = await Webinar.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      pagination,
+      data: webinars.map(w => w.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -153,15 +216,28 @@ export const getActiveSmartLearningWebinars = async (req, res) => {
 // =======================
 export const getActiveLiveWorkshops = async (req, res) => {
   try {
-    const webinars = await Webinar.find({
+    const { page, limit, skip } = getPagination(req);
+
+    const filter = {
       webinarType: "Live Operative Workshops",
       status: "Active",
-    }).sort({ createdAt: -1 });
+    };
+
+    const total = await Webinar.countDocuments(filter);
+
+    const webinars = await Webinar.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      pagination,
+      data: webinars.map(w => w.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
