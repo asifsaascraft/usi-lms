@@ -1,17 +1,30 @@
 // controllers/courseController.js
 import Course from "../models/Course.js";
+import { getPagination, buildPaginationMeta } from "../utils/pagination.js";
 
 // =======================
 // Get all courses (public)
 // =======================
 export const getCourses = async (req, res) => {
   try {
-    const courses = await Course.find().sort({ createdAt: -1 });
+
+    const { page, limit, skip } = getPagination(req);
+
+    const total = await Course.countDocuments();
+
+    const courses = await Course.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: courses.map((c) => c.toObject({ virtuals: true })),
+      pagination,
+      data: courses.map(c => c.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -26,14 +39,26 @@ export const getCourses = async (req, res) => {
 // =======================
 export const getActiveCourses = async (req, res) => {
   try {
-    const courses = await Course.find({ status: "Active" }).sort({
-      createdAt: -1,
-    });
+
+    const { page, limit, skip } = getPagination(req);
+
+    const filter = { status: "Active" };
+
+    const total = await Course.countDocuments(filter);
+
+    const courses = await Course.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     res.json({
       success: true,
-      data: courses.map((c) => c.toObject({ virtuals: true })),
+      pagination,
+      data: courses.map(c => c.toObject({ virtuals: true })),
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

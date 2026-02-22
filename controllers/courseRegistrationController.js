@@ -3,6 +3,7 @@
 import CourseRegistration from "../models/CourseRegistration.js";
 import Course from "../models/Course.js";
 import User from "../models/User.js";
+import { getPagination, buildPaginationMeta } from "../utils/pagination.js";
 
 // ==============================
 // Register user into course
@@ -121,6 +122,8 @@ export const getUserCourseRegistrations = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const { page, limit, skip } = getPagination(req);
+
     // Validate user
     const user = await User.findById(userId);
     if (!user) {
@@ -130,13 +133,21 @@ export const getUserCourseRegistrations = async (req, res) => {
       });
     }
 
-    const registrations = await CourseRegistration.find({ userId })
+    const filter = { userId };
+
+    const total = await CourseRegistration.countDocuments(filter);
+
+    const registrations = await CourseRegistration.find(filter)
       .populate("courseId")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.json({
       success: true,
-      total: registrations.length,
+      pagination,
       data: registrations.map((x) => ({
         id: x._id,
         course: x.courseId,
@@ -146,6 +157,7 @@ export const getUserCourseRegistrations = async (req, res) => {
         membershipNumber: x.membershipNumber,
       })),
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -162,6 +174,8 @@ export const getRegistrationsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
 
+    const { page, limit, skip } = getPagination(req);
+
     // Validate course
     const course = await Course.findById(courseId);
     if (!course) {
@@ -171,9 +185,17 @@ export const getRegistrationsByCourse = async (req, res) => {
       });
     }
 
-    const registrations = await CourseRegistration.find({ courseId })
+    const filter = { courseId };
+
+    const total = await CourseRegistration.countDocuments(filter);
+
+    const registrations = await CourseRegistration.find(filter)
       .populate("userId", "name email mobile prefix")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.json({
       success: true,
@@ -181,13 +203,14 @@ export const getRegistrationsByCourse = async (req, res) => {
         id: course._id,
         courseName: course.courseName,
       },
-      total: registrations.length,
+      pagination,
       data: registrations.map((r) => ({
         registrationId: r._id,
         registeredOn: r.createdAt,
         user: r.userId,
       })),
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,

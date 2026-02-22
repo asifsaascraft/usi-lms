@@ -3,6 +3,7 @@
 import WebinarRegistration from "../models/WebinarRegistration.js";
 import Webinar from "../models/Webinar.js";
 import User from "../models/User.js";
+import { getPagination, buildPaginationMeta } from "../utils/pagination.js";
 import moment from "moment-timezone";
 
 // ==============================
@@ -123,7 +124,8 @@ export const getUserWebinarRegistrations = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Validate user
+    const { page, limit, skip } = getPagination(req);
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({
@@ -132,13 +134,21 @@ export const getUserWebinarRegistrations = async (req, res) => {
       });
     }
 
-    const registrations = await WebinarRegistration.find({ userId })
+    const filter = { userId };
+
+    const total = await WebinarRegistration.countDocuments(filter);
+
+    const registrations = await WebinarRegistration.find(filter)
       .populate("webinarId")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.json({
       success: true,
-      total: registrations.length,
+      pagination,
       data: registrations.map((x) => ({
         id: x._id,
         webinar: x.webinarId,
@@ -148,6 +158,7 @@ export const getUserWebinarRegistrations = async (req, res) => {
         membershipNumber: x.membershipNumber,
       })),
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -164,7 +175,8 @@ export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
-    // Validate webinar
+    const { page, limit, skip } = getPagination(req);
+
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
       return res.status(404).json({
@@ -173,9 +185,17 @@ export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
       });
     }
 
-    const registrations = await WebinarRegistration.find({ webinarId })
+    const filter = { webinarId };
+
+    const total = await WebinarRegistration.countDocuments(filter);
+
+    const registrations = await WebinarRegistration.find(filter)
       .populate("userId", "name email mobile prefix")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.json({
       success: true,
@@ -183,7 +203,7 @@ export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
         id: webinar._id,
         name: webinar.name,
       },
-      total: registrations.length,
+      pagination,
       data: registrations.map((r) => ({
         registrationId: r._id,
         registeredOn: r.createdAt,
@@ -191,6 +211,7 @@ export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
         email: r.email,
       })),
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -211,6 +232,8 @@ export const getAllWebinarRegistrations = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
+    const { page, limit, skip } = getPagination(req);
+
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
       return res.status(404).json({
@@ -219,9 +242,17 @@ export const getAllWebinarRegistrations = async (req, res) => {
       });
     }
 
-    const registrations = await WebinarRegistration.find({ webinarId })
+    const filter = { webinarId };
+
+    const total = await WebinarRegistration.countDocuments(filter);
+
+    const registrations = await WebinarRegistration.find(filter)
       .populate("userId")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.status(200).json({
       success: true,
@@ -235,13 +266,13 @@ export const getAllWebinarRegistrations = async (req, res) => {
         attendedMailSent: webinar.attendedMailSent,
         notAttendedMailSent: webinar.notAttendedMailSent,
       },
-      total: registrations.length,
-      attendedCount: registrations.filter(r => r.attended).length,
-      notAttendedCount: registrations.filter(r => !r.attended).length,
+      pagination,
+      attendedCount: await WebinarRegistration.countDocuments({ webinarId, attended: true }),
+      notAttendedCount: await WebinarRegistration.countDocuments({ webinarId, attended: false }),
       data: registrations,
     });
+
   } catch (error) {
-    console.error("Get all webinar registrations error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch webinar registrations",
@@ -249,6 +280,7 @@ export const getAllWebinarRegistrations = async (req, res) => {
     });
   }
 };
+
 /**
  * ==========================================
  * ADMIN: Get ONLY attended users
@@ -259,6 +291,8 @@ export const getAttendedUsers = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
+    const { page, limit, skip } = getPagination(req);
+
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
       return res.status(404).json({
@@ -267,26 +301,29 @@ export const getAttendedUsers = async (req, res) => {
       });
     }
 
-    const attendedUsers = await WebinarRegistration.find({
-      webinarId,
-      attended: true,
-    })
+    const filter = { webinarId, attended: true };
+
+    const total = await WebinarRegistration.countDocuments(filter);
+
+    const attendedUsers = await WebinarRegistration.find(filter)
       .populate("userId")
-      .sort({ attendedAt: -1 });
+      .sort({ attendedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.status(200).json({
       success: true,
       webinar: {
         id: webinar._id,
         name: webinar.name,
-        attendedMailSent: webinar.attendedMailSent,
-        notAttendedMailSent: webinar.notAttendedMailSent,
       },
-      count: attendedUsers.length,
+      pagination,
       data: attendedUsers,
     });
+
   } catch (error) {
-    console.error("Get attended users error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch attended users",
@@ -305,6 +342,8 @@ export const getNotAttendedUsers = async (req, res) => {
   try {
     const { webinarId } = req.params;
 
+    const { page, limit, skip } = getPagination(req);
+
     const webinar = await Webinar.findById(webinarId);
     if (!webinar) {
       return res.status(404).json({
@@ -313,26 +352,29 @@ export const getNotAttendedUsers = async (req, res) => {
       });
     }
 
-    const notAttendedUsers = await WebinarRegistration.find({
-      webinarId,
-      attended: false,
-    })
+    const filter = { webinarId, attended: false };
+
+    const total = await WebinarRegistration.countDocuments(filter);
+
+    const notAttendedUsers = await WebinarRegistration.find(filter)
       .populate("userId")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const pagination = buildPaginationMeta(total, page, limit);
 
     return res.status(200).json({
       success: true,
       webinar: {
         id: webinar._id,
         name: webinar.name,
-        attendedMailSent: webinar.attendedMailSent,
-        notAttendedMailSent: webinar.notAttendedMailSent,
       },
-      count: notAttendedUsers.length,
+      pagination,
       data: notAttendedUsers,
     });
+
   } catch (error) {
-    console.error("Get not attended users error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch not attended users",
