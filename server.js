@@ -14,6 +14,7 @@ import userRoutes from "./routes/userRoutes.js";
 import webinarRoutes from "./routes/webinarRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import conferenceRoutes from "./routes/conferenceRoutes.js";
+import disclaimerRoutes from "./routes/disclaimerRoutes.js";
 import speakerRoutes from "./routes/speakerRoutes.js";
 import assignSpeakerRoutes from "./routes/assignSpeakerRoutes.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
@@ -49,8 +50,8 @@ const app = express();
 // CORS setup for multiple frontends
 // =======================
 const allowedOrigins = [
-  "https://localhost:3000",
-  "https://localhost:3001",
+  "http://localhost:3000",
+  "http://localhost:3001",
   process.env.ADMIN_FRONTEND_URL,
   process.env.USER_FRONTEND_URL,
 ];
@@ -92,6 +93,7 @@ app.use("/api/users", userRoutes);
 app.use("/api", webinarRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", conferenceRoutes);
+app.use("/api", disclaimerRoutes);
 app.use("/api", speakerRoutes);
 app.use("/api", assignSpeakerRoutes);
 app.use("/api", meetingRoutes);
