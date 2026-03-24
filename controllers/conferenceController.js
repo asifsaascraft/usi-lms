@@ -1,5 +1,6 @@
 // controllers/conferenceController.js
 import Conference from "../models/Conference.js";
+import Disclaimer from "../models/Disclaimer.js";
 
 // =======================
 // Get all conferences (public)
@@ -8,9 +9,22 @@ export const getConferences = async (req, res) => {
   try {
     const conferences = await Conference.find().sort({ createdAt: -1 });
 
+    // Fetch single disclaimer
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = conferences.map((c) => {
+      const obj = c.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: conferences.map((c) => c.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -30,9 +44,21 @@ export const getActiveConferences = async (req, res) => {
       createdAt: -1,
     });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = conferences.map((c) => {
+      const obj = c.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: conferences.map((c) => c.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -57,9 +83,17 @@ export const getConferenceById = async (req, res) => {
         .json({ success: false, message: "Conference not found" });
     }
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const obj = conference.toObject({ virtuals: true });
+
+    if (obj.disclaimer && disclaimerDoc) {
+      obj.disclaimerName = disclaimerDoc.disclaimerName;
+    }
+
     res.json({
       success: true,
-      data: conference.toObject({ virtuals: true }),
+      data: obj,
     });
   } catch (error) {
     res.status(500).json({
