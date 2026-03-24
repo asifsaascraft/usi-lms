@@ -1,6 +1,6 @@
 // controllers/webinarController.js
 import Webinar from "../models/Webinar.js";
-
+import Disclaimer from "../models/Disclaimer.js";
 
 // =======================
 // Get all webinars (public)
@@ -9,9 +9,21 @@ export const getWebinars = async (req, res) => {
   try {
     const webinars = await Webinar.find().sort({ createdAt: -1 });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = webinars.map((w) => {
+      const obj = w.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -31,9 +43,21 @@ export const getActiveWebinars = async (req, res) => {
       createdAt: -1,
     });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = webinars.map((w) => {
+      const obj = w.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -53,8 +77,18 @@ export const getUpcomingWebinars = async (req, res) => {
       createdAt: -1,
     });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
     const result = webinars
-      .map((w) => w.toObject({ virtuals: true }))
+      .map((w) => {
+        const obj = w.toObject({ virtuals: true });
+
+        if (obj.disclaimer && disclaimerDoc) {
+          obj.disclaimerName = disclaimerDoc.disclaimerName;
+        }
+
+        return obj;
+      })
       .filter(
         (w) => w.dynamicStatus === "Upcoming" || w.dynamicStatus === "Live"
       );
@@ -89,9 +123,17 @@ export const getActiveWebinarById = async (req, res) => {
       });
     }
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const obj = webinar.toObject({ virtuals: true });
+
+    if (obj.disclaimer && disclaimerDoc) {
+      obj.disclaimerName = disclaimerDoc.disclaimerName;
+    }
+
     res.json({
       success: true,
-      data: webinar.toObject({ virtuals: true }),
+      data: obj,
     });
   } catch (error) {
     res.status(500).json({
@@ -112,9 +154,21 @@ export const getActiveUSIWebinars = async (req, res) => {
       status: "Active",
     }).sort({ createdAt: -1 });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = webinars.map((w) => {
+      const obj = w.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -135,9 +189,21 @@ export const getActiveSmartLearningWebinars = async (req, res) => {
       status: "Active",
     }).sort({ createdAt: -1 });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = webinars.map((w) => {
+      const obj = w.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -158,9 +224,21 @@ export const getActiveLiveWorkshops = async (req, res) => {
       status: "Active",
     }).sort({ createdAt: -1 });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = webinars.map((w) => {
+      const obj = w.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: webinars.map((w) => w.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -178,12 +256,25 @@ export const getWebinarById = async (req, res) => {
   try {
     const { id } = req.params;
     const webinar = await Webinar.findById(id);
+
     if (!webinar) {
       return res
         .status(404)
         .json({ success: false, message: "Webinar not found" });
     }
-    res.json({ success: true, data: webinar.toObject({ virtuals: true }) });
+
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const obj = webinar.toObject({ virtuals: true });
+
+    if (obj.disclaimer && disclaimerDoc) {
+      obj.disclaimerName = disclaimerDoc.disclaimerName;
+    }
+
+    res.json({
+      success: true,
+      data: obj,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -208,6 +299,7 @@ export const createWebinar = async (req, res) => {
     const webinarData = {
       ...req.body,
       image: req.files.image[0].location,
+      disclaimer: req.body.disclaimer === "true" || req.body.disclaimer === true,
     };
 
     if (req.files?.brochureUpload?.[0]) {
@@ -241,6 +333,11 @@ export const updateWebinar = async (req, res) => {
 
     if (req.files?.image?.[0]) {
       updatedData.image = req.files.image[0].location;
+    }
+    
+    if (req.body.disclaimer !== undefined) {
+      updatedData.disclaimer =
+        req.body.disclaimer === "true" || req.body.disclaimer === true;
     }
 
     if (req.files?.brochureUpload?.[0]) {

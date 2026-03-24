@@ -21,6 +21,10 @@ const CourseRegistrationSchema = new mongoose.Schema(
     membershipNumber: {
       type: String,
     },
+    disclaimer: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

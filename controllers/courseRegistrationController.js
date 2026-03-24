@@ -9,7 +9,14 @@ import User from "../models/User.js";
 // ==============================
 export const registerToCourse = async (req, res) => {
   try {
-    const { courseId, userId, email, mobile, membershipNumber } = req.body;
+    const {
+      courseId,
+      userId,
+      email,
+      mobile,
+      membershipNumber,
+      disclaimer,
+    } = req.body;
 
     // ------------------------------------
     // Validate required IDs
@@ -89,6 +96,24 @@ export const registerToCourse = async (req, res) => {
       });
     }
 
+    // =====================================
+    //  HANDLE DISCLAIMER (SAME AS CONFERENCE)
+    // =====================================
+    let disclaimerValue = false;
+
+    if (course.disclaimer === true) {
+      if (disclaimer === "true" || disclaimer === true) {
+        disclaimerValue = true;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Disclaimer must be accepted for this course",
+        });
+      }
+    } else {
+      disclaimerValue = false;
+    }
+
     // ------------------------------------
     // Register now
     // ------------------------------------
@@ -98,6 +123,7 @@ export const registerToCourse = async (req, res) => {
       email,
       mobile,
       membershipNumber,
+      disclaimer: disclaimerValue,
     });
 
     return res.status(201).json({
@@ -144,6 +170,7 @@ export const getUserCourseRegistrations = async (req, res) => {
         email: x.email,
         mobile: x.mobile,
         membershipNumber: x.membershipNumber,
+        disclaimer: x.disclaimer,
       })),
     });
   } catch (error) {
@@ -186,6 +213,8 @@ export const getRegistrationsByCourse = async (req, res) => {
         registrationId: r._id,
         registeredOn: r.createdAt,
         user: r.userId,
+        email: r.email,
+        disclaimer: r.disclaimer,
       })),
     });
   } catch (error) {

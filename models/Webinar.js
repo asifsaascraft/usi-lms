@@ -46,6 +46,10 @@ const WebinarSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    disclaimer: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       enum: ["Active", "Inactive"], //  restricts to these values

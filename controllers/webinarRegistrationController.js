@@ -10,7 +10,14 @@ import moment from "moment-timezone";
 // ==============================
 export const registerToWebinar = async (req, res) => {
   try {
-    const { webinarId, userId, email, mobile, membershipNumber } = req.body;
+    const {
+      webinarId,
+      userId,
+      email,
+      mobile,
+      membershipNumber,
+      disclaimer,
+    } = req.body;
 
     // ------------------------------------
     // Validate required IDs exist
@@ -91,6 +98,24 @@ export const registerToWebinar = async (req, res) => {
       });
     }
 
+    // =====================================
+    //  HANDLE DISCLAIMER (NEW)
+    // =====================================
+    let disclaimerValue = false;
+
+    if (webinar.disclaimer === true) {
+      if (disclaimer === "true" || disclaimer === true) {
+        disclaimerValue = true;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Disclaimer must be accepted for this webinar",
+        });
+      }
+    } else {
+      disclaimerValue = false;
+    }
+
     // ------------------------------------
     // Register now
     // ------------------------------------
@@ -100,6 +125,7 @@ export const registerToWebinar = async (req, res) => {
       email,
       mobile,
       membershipNumber,
+      disclaimer: disclaimerValue,
     });
 
     return res.status(201).json({
@@ -146,6 +172,7 @@ export const getUserWebinarRegistrations = async (req, res) => {
         email: x.email,
         mobile: x.mobile,
         membershipNumber: x.membershipNumber,
+        disclaimer: x.disclaimer,
       })),
     });
   } catch (error) {
@@ -189,6 +216,7 @@ export const getWebinarRegistrationsForAdminSimple = async (req, res) => {
         registeredOn: r.createdAt,
         user: r.userId,
         email: r.email,
+        disclaimer: r.disclaimer,
       })),
     });
   } catch (error) {

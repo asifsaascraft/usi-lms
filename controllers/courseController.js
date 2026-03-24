@@ -1,5 +1,6 @@
 // controllers/courseController.js
 import Course from "../models/Course.js";
+import Disclaimer from "../models/Disclaimer.js";
 
 // =======================
 // Get all courses (public)
@@ -8,9 +9,21 @@ export const getCourses = async (req, res) => {
   try {
     const courses = await Course.find().sort({ createdAt: -1 });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = courses.map((c) => {
+      const obj = c.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: courses.map((c) => c.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -30,9 +43,21 @@ export const getActiveCourses = async (req, res) => {
       createdAt: -1,
     });
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const data = courses.map((c) => {
+      const obj = c.toObject({ virtuals: true });
+
+      if (obj.disclaimer && disclaimerDoc) {
+        obj.disclaimerName = disclaimerDoc.disclaimerName;
+      }
+
+      return obj;
+    });
+
     res.json({
       success: true,
-      data: courses.map((c) => c.toObject({ virtuals: true })),
+      data,
     });
   } catch (error) {
     res.status(500).json({
@@ -59,9 +84,17 @@ export const getActiveCourseById = async (req, res) => {
       });
     }
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const obj = course.toObject({ virtuals: true });
+
+    if (obj.disclaimer && disclaimerDoc) {
+      obj.disclaimerName = disclaimerDoc.disclaimerName;
+    }
+
     res.json({
       success: true,
-      data: course.toObject({ virtuals: true }),
+      data: obj,
     });
   } catch (error) {
     res.status(500).json({
@@ -86,9 +119,17 @@ export const getCourseById = async (req, res) => {
         .json({ success: false, message: "Course not found" });
     }
 
+    const disclaimerDoc = await Disclaimer.findOne();
+
+    const obj = course.toObject({ virtuals: true });
+
+    if (obj.disclaimer && disclaimerDoc) {
+      obj.disclaimerName = disclaimerDoc.disclaimerName;
+    }
+
     res.json({
       success: true,
-      data: course.toObject({ virtuals: true }),
+      data: obj,
     });
   } catch (error) {
     res.status(500).json({
@@ -114,6 +155,7 @@ export const createCourse = async (req, res) => {
     const courseData = {
       ...req.body,
       image: req.file.location,
+      disclaimer: req.body.disclaimer === "true" || req.body.disclaimer === true,
     };
 
     const newCourse = await Course.create(courseData);
@@ -140,6 +182,11 @@ export const updateCourse = async (req, res) => {
 
     const updatedData = { ...req.body };
     if (req.file) updatedData.image = req.file.location;
+
+    if (req.body.disclaimer !== undefined) {
+      updatedData.disclaimer =
+        req.body.disclaimer === "true" || req.body.disclaimer === true;
+    }
 
     const updatedCourse = await Course.findByIdAndUpdate(id, updatedData, {
       new: true,

@@ -21,6 +21,10 @@ const WebinarRegistrationSchema = new mongoose.Schema(
     membershipNumber: {
       type: String,
     },
+    disclaimer: {
+      type: Boolean,
+      default: false,
+    },
     // Attendance Tracking
     attended: {
       type: Boolean,
