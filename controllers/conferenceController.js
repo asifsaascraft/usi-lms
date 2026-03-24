@@ -85,6 +85,7 @@ export const createConference = async (req, res) => {
     const conferenceData = {
       ...req.body,
       image: req.file.location,
+      disclaimer: req.body.disclaimer === "true" || req.body.disclaimer === true,
     };
 
     const newConference = await Conference.create(conferenceData);
@@ -111,6 +112,11 @@ export const updateConference = async (req, res) => {
 
     const updatedData = { ...req.body };
     if (req.file) updatedData.image = req.file.location;
+
+    if (req.body.disclaimer !== undefined) {
+      updatedData.disclaimer =
+        req.body.disclaimer === "true" || req.body.disclaimer === true;
+    }
 
     const updatedConference = await Conference.findByIdAndUpdate(
       id,

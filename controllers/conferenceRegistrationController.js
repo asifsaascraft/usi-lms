@@ -1,5 +1,3 @@
-// controllers/conferenceRegistrationController.js
-
 import ConferenceRegistration from "../models/ConferenceRegistration.js";
 import Conference from "../models/Conference.js";
 import User from "../models/User.js";
@@ -9,7 +7,14 @@ import User from "../models/User.js";
 // ==============================
 export const registerToConference = async (req, res) => {
   try {
-    const { conferenceId, userId, email, mobile, membershipNumber } = req.body;
+    const {
+      conferenceId,
+      userId,
+      email,
+      mobile,
+      membershipNumber,
+      disclaimer,
+    } = req.body;
 
     // ------------------------------------
     // Validate required IDs
@@ -21,7 +26,9 @@ export const registerToConference = async (req, res) => {
       });
     }
 
+    // ------------------------------------
     // Check conference exists
+    // ------------------------------------
     const conference = await Conference.findById(conferenceId);
     if (!conference) {
       return res.status(400).json({
@@ -30,7 +37,9 @@ export const registerToConference = async (req, res) => {
       });
     }
 
+    // ------------------------------------
     // Check user exists
+    // ------------------------------------
     const user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({
@@ -90,6 +99,27 @@ export const registerToConference = async (req, res) => {
     }
 
     // ------------------------------------
+    // Handle Disclaimer Logic 
+    // ------------------------------------
+    let disclaimerValue = false;
+
+    if (conference.disclaimer === true) {
+      // Conference requires disclaimer acceptance
+
+      if (disclaimer === "true" || disclaimer === true) {
+        disclaimerValue = true;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Disclaimer must be accepted for this conference",
+        });
+      }
+    } else {
+      // Conference does NOT require disclaimer
+      disclaimerValue = false;
+    }
+
+    // ------------------------------------
     // Register now
     // ------------------------------------
     const newRegistration = await ConferenceRegistration.create({
@@ -98,6 +128,7 @@ export const registerToConference = async (req, res) => {
       email,
       mobile,
       membershipNumber,
+      disclaimer: disclaimerValue, 
     });
 
     return res.status(201).json({
@@ -144,6 +175,7 @@ export const getUserConferenceRegistrations = async (req, res) => {
         email: x.email,
         mobile: x.mobile,
         membershipNumber: x.membershipNumber,
+        disclaimer: x.disclaimer, 
       })),
     });
   } catch (error) {
@@ -187,6 +219,7 @@ export const getConferenceRegistrationsForAdmin = async (req, res) => {
         registeredOn: r.createdAt,
         user: r.userId,
         email: r.email,
+        disclaimer: r.disclaimer, 
       })),
     });
   } catch (error) {
