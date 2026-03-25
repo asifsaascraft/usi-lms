@@ -61,7 +61,7 @@ export const createTopic = async (req, res) => {
     // -----------------------
     // Conditional validation
     // -----------------------
-    if (topicType === "Panel Discussion" && !moderator) {
+    if (topicType === "Panel Discussion" && (!moderator || moderator.length === 0)) {
       return res.status(400).json({
         success: false,
         message: "Moderator is required for Panel Discussion",
@@ -117,7 +117,10 @@ export const updateTopic = async (req, res) => {
     const updateData = req.body;
 
     // Conditional validation
-    if (updateData.topicType === "Panel Discussion" && !updateData.moderator) {
+    if (
+      updateData.topicType === "Panel Discussion" &&
+      (!updateData.moderator || updateData.moderator.length === 0)
+    ) {
       return res.status(400).json({
         success: false,
         message: "Moderator is required for Panel Discussion",

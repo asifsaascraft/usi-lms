@@ -41,10 +41,10 @@ const TopicSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
     }],
-    moderator: {
+    moderator: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
-    },
+    }],
     panelist: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
