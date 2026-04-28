@@ -49,10 +49,10 @@ const TopicSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
     }],
-    quizMaster: {
+    quizMaster: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
-    },
+    }],
     teamMember: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Speaker",
