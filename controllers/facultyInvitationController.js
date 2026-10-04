@@ -75,8 +75,6 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
     mergeInfo.date = invitation.date || "";
 
     mergeInfo.time = invitation.time || "";
-
-    mergeInfo.venue = invitation.venue || "";
   }
 
   // -------------------------------------------------------

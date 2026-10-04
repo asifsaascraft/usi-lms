@@ -31,12 +31,7 @@ const escapeHtml = (value = "") => {
  * @param {string} params.templateKey
  * @param {Object} params.mergeInfo
  */
-const sendEmailWithTemplate = async ({
-  to,
-  name,
-  templateKey,
-  mergeInfo,
-}) => {
+const sendEmailWithTemplate = async ({ to, name, templateKey, mergeInfo }) => {
   try {
     const resp = await client.sendMailWithTemplate({
       mail_template_key: templateKey,
@@ -60,10 +55,7 @@ const sendEmailWithTemplate = async ({
 
     return resp;
   } catch (error) {
-    console.error(
-      "sendEmailWithTemplate error:",
-      error,
-    );
+    console.error("sendEmailWithTemplate error:", error);
 
     throw error;
   }
@@ -78,23 +70,17 @@ export const sendFacultyResponseNotification = async ({
   invitation,
 }) => {
   try {
-    const emails = process.env.FACULTY_NOTIFICATION_EMAILS
-      ?.split(",")
+    const emails = process.env.FACULTY_NOTIFICATION_EMAILS?.split(",")
       .map((email) => email.trim())
       .filter(Boolean);
 
     if (!emails?.length) {
-      console.warn(
-        "FACULTY_NOTIFICATION_EMAILS is not configured.",
-      );
+      console.warn("FACULTY_NOTIFICATION_EMAILS is not configured.");
 
       return;
     }
 
-    const responseText =
-      status === "ACCEPTED"
-        ? "ACCEPTED"
-        : "DECLINED";
+    const responseText = status === "ACCEPTED" ? "ACCEPTED" : "DECLINED";
 
     const recipients = emails.map((email) => ({
       email_address: {
@@ -221,16 +207,6 @@ export const sendFacultyResponseNotification = async ({
               : ""
           }
 
-          ${
-            invitation.venue
-              ? `
-                <p>
-                  <strong>Venue:</strong>
-                  ${escapeHtml(invitation.venue)}
-                </p>
-              `
-              : ""
-          }
 
           <p>
             <strong>Response:</strong>
@@ -240,9 +216,7 @@ export const sendFacultyResponseNotification = async ({
           <p>
             <strong>Responded At:</strong>
             ${escapeHtml(
-              invitation.respondedAt
-                ? invitation.respondedAt.toString()
-                : "",
+              invitation.respondedAt ? invitation.respondedAt.toString() : "",
             )}
           </p>
 
@@ -260,18 +234,14 @@ export const sendFacultyResponseNotification = async ({
 
       to: recipients,
 
-      subject:
-        `Faculty Invitation ${responseText} - ${invitation.name}`,
+      subject: `Faculty Invitation ${responseText} - ${invitation.name}`,
 
       htmlbody: htmlBody,
     });
 
     return response;
   } catch (error) {
-    console.error(
-      "sendFacultyResponseNotification error:",
-      error,
-    );
+    console.error("sendFacultyResponseNotification error:", error);
 
     // Important:
     // Do NOT throw this error.

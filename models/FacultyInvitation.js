@@ -72,10 +72,6 @@ const FacultyInvitationSchema = new mongoose.Schema(
       trim: true,
     },
 
-    venue: {
-      type: String,
-      trim: true,
-    },
 
     // For PANELIST:
     // person[0] = Moderator
