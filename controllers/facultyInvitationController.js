@@ -9,9 +9,7 @@ import {
   hashResponseToken,
 } from "../utils/invitationResponseToken.js";
 
-import {
-  getFacultyTemplateKey,
-} from "../config/facultyInvitationTemplates.js";
+import { getFacultyTemplateKey } from "../config/facultyInvitationTemplates.js";
 
 /**
  * ---------------------------------------------------------
@@ -58,18 +56,13 @@ import {
  *   accept_url
  *   decline_url
  */
-const buildMergeInfo = (
-  invitation,
-  responseUrls = {},
-) => {
+const buildMergeInfo = (invitation, responseUrls = {}) => {
   const mergeInfo = {
     faculty_name: invitation.name || "",
 
-    accept_url:
-      responseUrls.acceptUrl || "",
+    accept_url: responseUrls.acceptUrl || "",
 
-    decline_url:
-      responseUrls.declineUrl || "",
+    decline_url: responseUrls.declineUrl || "",
   };
 
   // -------------------------------------------------------
@@ -77,17 +70,13 @@ const buildMergeInfo = (
   // -------------------------------------------------------
 
   if (invitation.invitationType === "WORKSHOP") {
-    mergeInfo.workshop_name =
-      invitation.workshopName || "";
+    mergeInfo.workshop_name = invitation.workshopName || "";
 
-    mergeInfo.date =
-      invitation.date || "";
+    mergeInfo.date = invitation.date || "";
 
-    mergeInfo.time =
-      invitation.time || "";
+    mergeInfo.time = invitation.time || "";
 
-    mergeInfo.venue =
-      invitation.venue || "";
+    mergeInfo.venue = invitation.venue || "";
   }
 
   // -------------------------------------------------------
@@ -95,17 +84,13 @@ const buildMergeInfo = (
   // -------------------------------------------------------
 
   if (invitation.invitationType === "SOLO_TALK") {
-    mergeInfo.topic =
-      invitation.topic || "";
+    mergeInfo.topic = invitation.topic || "";
 
-    mergeInfo.date =
-      invitation.date || "";
+    mergeInfo.date = invitation.date || "";
 
-    mergeInfo.time =
-      invitation.time || "";
+    mergeInfo.time = invitation.time || "";
 
-    mergeInfo.hall =
-      invitation.hall || "";
+    mergeInfo.hall = invitation.hall || "";
   }
 
   // -------------------------------------------------------
@@ -113,27 +98,20 @@ const buildMergeInfo = (
   // -------------------------------------------------------
 
   if (invitation.invitationType === "PANELIST") {
-    mergeInfo.topic =
-      invitation.topic || "";
+    mergeInfo.topic = invitation.topic || "";
 
-    mergeInfo.date =
-      invitation.date || "";
+    mergeInfo.date = invitation.date || "";
 
-    mergeInfo.time =
-      invitation.time || "";
+    mergeInfo.time = invitation.time || "";
 
-    mergeInfo.hall =
-      invitation.hall || "";
+    mergeInfo.hall = invitation.hall || "";
 
-    const panelPeople =
-      invitation.panelPeople || [];
+    const panelPeople = invitation.panelPeople || [];
 
     for (let i = 0; i < 4; i++) {
-      mergeInfo[`person_${i + 1}_name`] =
-        panelPeople[i]?.name || "";
+      mergeInfo[`person_${i + 1}_name`] = panelPeople[i]?.name || "";
 
-      mergeInfo[`person_${i + 1}_contact`] =
-        panelPeople[i]?.contact || "";
+      mergeInfo[`person_${i + 1}_contact`] = panelPeople[i]?.contact || "";
     }
   }
 
@@ -142,27 +120,20 @@ const buildMergeInfo = (
   // -------------------------------------------------------
 
   if (invitation.invitationType === "MODERATOR") {
-    mergeInfo.topic =
-      invitation.topic || "";
+    mergeInfo.topic = invitation.topic || "";
 
-    mergeInfo.date =
-      invitation.date || "";
+    mergeInfo.date = invitation.date || "";
 
-    mergeInfo.time =
-      invitation.time || "";
+    mergeInfo.time = invitation.time || "";
 
-    mergeInfo.hall =
-      invitation.hall || "";
+    mergeInfo.hall = invitation.hall || "";
 
-    const panelPeople =
-      invitation.panelPeople || [];
+    const panelPeople = invitation.panelPeople || [];
 
     for (let i = 0; i < 4; i++) {
-      mergeInfo[`person_${i + 1}_name`] =
-        panelPeople[i]?.name || "";
+      mergeInfo[`person_${i + 1}_name`] = panelPeople[i]?.name || "";
 
-      mergeInfo[`person_${i + 1}_contact`] =
-        panelPeople[i]?.contact || "";
+      mergeInfo[`person_${i + 1}_contact`] = panelPeople[i]?.contact || "";
     }
   }
 
@@ -176,31 +147,21 @@ const buildMergeInfo = (
  *
  * POST /
  */
-export const createFacultyInvitation = async (
-  req,
-  res,
-) => {
+export const createFacultyInvitation = async (req, res) => {
   try {
-    const invitation =
-      await FacultyInvitation.create(req.body);
+    const invitation = await FacultyInvitation.create(req.body);
 
     return res.status(201).json({
       success: true,
-      message:
-        "Faculty invitation created successfully",
+      message: "Faculty invitation created successfully",
       data: invitation,
     });
   } catch (error) {
-    console.error(
-      "createFacultyInvitation error:",
-      error,
-    );
+    console.error("createFacultyInvitation error:", error);
 
     return res.status(400).json({
       success: false,
-      message:
-        error?.message ||
-        "Failed to create faculty invitation",
+      message: error?.message || "Failed to create faculty invitation",
     });
   }
 };
@@ -225,17 +186,9 @@ export const createFacultyInvitation = async (
  * ?responseStatus=DECLINED
  * ?email=example@gmail.com
  */
-export const getAllFacultyInvitations = async (
-  req,
-  res,
-) => {
+export const getAllFacultyInvitations = async (req, res) => {
   try {
-    const {
-      group,
-      invitationType,
-      responseStatus,
-      email,
-    } = req.query;
+    const { group, invitationType, responseStatus, email } = req.query;
 
     const filter = {};
 
@@ -246,30 +199,24 @@ export const getAllFacultyInvitations = async (
 
     // Filter by invitation type
     if (invitationType) {
-      filter.invitationType =
-        invitationType;
+      filter.invitationType = invitationType;
     }
 
     // Filter by response status
     if (responseStatus) {
-      filter.responseStatus =
-        responseStatus;
+      filter.responseStatus = responseStatus;
     }
 
     // Filter by email
     if (email) {
-      filter.email =
-        email.toLowerCase().trim();
+      filter.email = email.toLowerCase().trim();
     }
 
-    const invitations =
-      await FacultyInvitation.find(filter)
-        .select(
-          "-responseTokenHash -responseTokenExpiresAt",
-        )
-        .sort({
-          createdAt: -1,
-        });
+    const invitations = await FacultyInvitation.find(filter)
+      .select("-responseTokenHash -responseTokenExpiresAt")
+      .sort({
+        createdAt: -1,
+      });
 
     return res.status(200).json({
       success: true,
@@ -277,16 +224,11 @@ export const getAllFacultyInvitations = async (
       data: invitations,
     });
   } catch (error) {
-    console.error(
-      "getAllFacultyInvitations error:",
-      error,
-    );
+    console.error("getAllFacultyInvitations error:", error);
 
     return res.status(500).json({
       success: false,
-      message:
-        error?.message ||
-        "Failed to get faculty invitations",
+      message: error?.message || "Failed to get faculty invitations",
     });
   }
 };
@@ -298,42 +240,32 @@ export const getAllFacultyInvitations = async (
  *
  * GET /:id
  */
-export const getFacultyInvitationById =
-  async (req, res) => {
-    try {
-      const invitation =
-        await FacultyInvitation.findById(
-          req.params.id,
-        ).select(
-          "-responseTokenHash -responseTokenExpiresAt",
-        );
+export const getFacultyInvitationById = async (req, res) => {
+  try {
+    const invitation = await FacultyInvitation.findById(req.params.id).select(
+      "-responseTokenHash -responseTokenExpiresAt",
+    );
 
-      if (!invitation) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Faculty invitation not found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: invitation,
-      });
-    } catch (error) {
-      console.error(
-        "getFacultyInvitationById error:",
-        error,
-      );
-
-      return res.status(400).json({
+    if (!invitation) {
+      return res.status(404).json({
         success: false,
-        message:
-          error?.message ||
-          "Invalid faculty invitation ID",
+        message: "Faculty invitation not found",
       });
     }
-  };
+
+    return res.status(200).json({
+      success: true,
+      data: invitation,
+    });
+  } catch (error) {
+    console.error("getFacultyInvitationById error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error?.message || "Invalid faculty invitation ID",
+    });
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -342,47 +274,38 @@ export const getFacultyInvitationById =
  *
  * PUT /:id
  */
-export const updateFacultyInvitation =
-  async (req, res) => {
-    try {
-      const invitation =
-        await FacultyInvitation.findByIdAndUpdate(
-          req.params.id,
-          req.body,
-          {
-            new: true,
-            runValidators: true,
-          },
-        );
+export const updateFacultyInvitation = async (req, res) => {
+  try {
+    const invitation = await FacultyInvitation.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
-      if (!invitation) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Faculty invitation not found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Faculty invitation updated successfully",
-        data: invitation,
-      });
-    } catch (error) {
-      console.error(
-        "updateFacultyInvitation error:",
-        error,
-      );
-
-      return res.status(400).json({
+    if (!invitation) {
+      return res.status(404).json({
         success: false,
-        message:
-          error?.message ||
-          "Failed to update faculty invitation",
+        message: "Faculty invitation not found",
       });
     }
-  };
+
+    return res.status(200).json({
+      success: true,
+      message: "Faculty invitation updated successfully",
+      data: invitation,
+    });
+  } catch (error) {
+    console.error("updateFacultyInvitation error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error?.message || "Failed to update faculty invitation",
+    });
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -391,42 +314,31 @@ export const updateFacultyInvitation =
  *
  * DELETE /:id
  */
-export const deleteFacultyInvitation =
-  async (req, res) => {
-    try {
-      const invitation =
-        await FacultyInvitation.findByIdAndDelete(
-          req.params.id,
-        );
+export const deleteFacultyInvitation = async (req, res) => {
+  try {
+    const invitation = await FacultyInvitation.findByIdAndDelete(req.params.id);
 
-      if (!invitation) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Faculty invitation not found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Faculty invitation deleted successfully",
-        data: invitation,
-      });
-    } catch (error) {
-      console.error(
-        "deleteFacultyInvitation error:",
-        error,
-      );
-
-      return res.status(400).json({
+    if (!invitation) {
+      return res.status(404).json({
         success: false,
-        message:
-          error?.message ||
-          "Failed to delete faculty invitation",
+        message: "Faculty invitation not found",
       });
     }
-  };
+
+    return res.status(200).json({
+      success: true,
+      message: "Faculty invitation deleted successfully",
+      data: invitation,
+    });
+  } catch (error) {
+    console.error("deleteFacultyInvitation error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error?.message || "Failed to delete faculty invitation",
+    });
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -435,158 +347,124 @@ export const deleteFacultyInvitation =
  *
  * POST /:id/send-email
  */
-export const sendSingleFacultyInvitationEmail =
-  async (req, res) => {
-    try {
-      const invitation =
-        await FacultyInvitation.findById(
-          req.params.id,
-        );
+export const sendSingleFacultyInvitationEmail = async (req, res) => {
+  try {
+    const invitation = await FacultyInvitation.findById(req.params.id);
 
-      if (!invitation) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "Faculty invitation not found",
-        });
-      }
-
-      // ---------------------------------------------------
-      // GET ZEPTOMAIL TEMPLATE
-      // ---------------------------------------------------
-
-      const templateKey =
-        getFacultyTemplateKey(
-          invitation.group,
-          invitation.invitationType,
-        );
-
-      // ---------------------------------------------------
-      // GENERATE NEW RESPONSE TOKEN
-      // ---------------------------------------------------
-      //
-      // Every time invitation is sent again,
-      // old response links become invalid.
-      //
-
-      const rawToken =
-        generateResponseToken();
-
-      const tokenHash =
-        hashResponseToken(rawToken);
-
-      invitation.responseTokenHash =
-        tokenHash;
-
-      invitation.responseTokenExpiresAt =
-        new Date(
-          Date.now() +
-            30 * 24 * 60 * 60 * 1000,
-        );
-
-      invitation.responseStatus =
-        "PENDING";
-
-      invitation.respondedAt = null;
-
-      await invitation.save();
-
-      // ---------------------------------------------------
-      // BUILD RESPONSE URLS
-      // ---------------------------------------------------
-
-      const baseUrl =
-        process.env.FACULTY_RESPONSE_BASE_URL;
-
-      if (!baseUrl) {
-        throw new Error(
-          "FACULTY_RESPONSE_BASE_URL is not configured",
-        );
-      }
-
-      const cleanBaseUrl =
-        baseUrl.replace(/\/$/, "");
-
-      const acceptUrl =
-        `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=accept`;
-
-      const declineUrl =
-        `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=decline`;
-
-      // ---------------------------------------------------
-      // BUILD MERGE VARIABLES
-      // ---------------------------------------------------
-
-      const mergeInfo =
-        buildMergeInfo(
-          invitation,
-          {
-            acceptUrl,
-            declineUrl,
-          },
-        );
-
-      // ---------------------------------------------------
-      // SEND EMAIL
-      // ---------------------------------------------------
-
-      const response =
-        await sendEmailWithTemplate({
-          to: invitation.email,
-          name: invitation.name,
-          templateKey,
-          mergeInfo,
-        });
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Faculty invitation email sent successfully",
-
-        data: {
-          invitationId:
-            invitation._id,
-
-          email:
-            invitation.email,
-
-          name:
-            invitation.name,
-
-          group:
-            invitation.group,
-
-          invitationType:
-            invitation.invitationType,
-
-          templateKey,
-
-          responseStatus:
-            invitation.responseStatus,
-
-          responseTokenExpiresAt:
-            invitation.responseTokenExpiresAt,
-
-          mergeInfo,
-
-          response,
-        },
-      });
-    } catch (error) {
-      console.error(
-        "sendSingleFacultyInvitationEmail error:",
-        error,
-      );
-
-      return res.status(500).json({
+    if (!invitation) {
+      return res.status(404).json({
         success: false,
-        message:
-          error?.error?.message ||
-          error?.message ||
-          "Failed to send faculty invitation email",
+        message: "Faculty invitation not found",
       });
     }
-  };
+
+    // ---------------------------------------------------
+    // GET ZEPTOMAIL TEMPLATE
+    // ---------------------------------------------------
+
+    const templateKey = getFacultyTemplateKey(
+      invitation.group,
+      invitation.invitationType,
+    );
+
+    // ---------------------------------------------------
+    // GENERATE NEW RESPONSE TOKEN
+    // ---------------------------------------------------
+    //
+    // Every time invitation is sent again,
+    // old response links become invalid.
+    //
+
+    const rawToken = generateResponseToken();
+
+    const tokenHash = hashResponseToken(rawToken);
+
+    invitation.responseTokenHash = tokenHash;
+
+    invitation.responseTokenExpiresAt = new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000,
+    );
+
+    invitation.responseStatus = "PENDING";
+
+    invitation.respondedAt = null;
+
+    await invitation.save();
+
+    // ---------------------------------------------------
+    // BUILD RESPONSE URLS
+    // ---------------------------------------------------
+
+    const baseUrl = process.env.FACULTY_RESPONSE_BASE_URL;
+
+    if (!baseUrl) {
+      throw new Error("FACULTY_RESPONSE_BASE_URL is not configured");
+    }
+
+    const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+
+    const acceptUrl = `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=accept`;
+
+    const declineUrl = `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=decline`;
+
+    // ---------------------------------------------------
+    // BUILD MERGE VARIABLES
+    // ---------------------------------------------------
+
+    const mergeInfo = buildMergeInfo(invitation, {
+      acceptUrl,
+      declineUrl,
+    });
+
+    // ---------------------------------------------------
+    // SEND EMAIL
+    // ---------------------------------------------------
+
+    const response = await sendEmailWithTemplate({
+      to: invitation.email,
+      name: invitation.name,
+      templateKey,
+      mergeInfo,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Faculty invitation email sent successfully",
+
+      data: {
+        invitationId: invitation._id,
+
+        email: invitation.email,
+
+        name: invitation.name,
+
+        group: invitation.group,
+
+        invitationType: invitation.invitationType,
+
+        templateKey,
+
+        responseStatus: invitation.responseStatus,
+
+        responseTokenExpiresAt: invitation.responseTokenExpiresAt,
+
+        mergeInfo,
+
+        response,
+      },
+    });
+  } catch (error) {
+    console.error("sendSingleFacultyInvitationEmail error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message:
+        error?.error?.message ||
+        error?.message ||
+        "Failed to send faculty invitation email",
+    });
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -600,211 +478,163 @@ export const sendSingleFacultyInvitationEmail =
  * All faculty invitations from MongoDB
  * will receive their respective emails.
  */
-export const sendBulkFacultyInvitationEmails =
-  async (req, res) => {
-    try {
-      // Get ALL faculty invitations
-      const invitations =
-        await FacultyInvitation.find({});
+export const sendBulkFacultyInvitationEmails = async (req, res) => {
+  try {
+    // Get ALL faculty invitations
+    const invitations = await FacultyInvitation.find({});
 
-      if (invitations.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message:
-            "No faculty invitations found",
-        });
-      }
-
-      const baseUrl =
-        process.env.FACULTY_RESPONSE_BASE_URL;
-
-      if (!baseUrl) {
-        throw new Error(
-          "FACULTY_RESPONSE_BASE_URL is not configured",
-        );
-      }
-
-      const cleanBaseUrl =
-        baseUrl.replace(/\/$/, "");
-
-      const results = [];
-
-      // ---------------------------------------------------
-      // SEND ONE BY ONE
-      // ---------------------------------------------------
-
-      for (const invitation of invitations) {
-        try {
-          // -----------------------------------------------
-          // GET TEMPLATE
-          // -----------------------------------------------
-
-          const templateKey =
-            getFacultyTemplateKey(
-              invitation.group,
-              invitation.invitationType,
-            );
-
-          // -----------------------------------------------
-          // GENERATE RESPONSE TOKEN
-          // -----------------------------------------------
-
-          const rawToken =
-            generateResponseToken();
-
-          const tokenHash =
-            hashResponseToken(
-              rawToken,
-            );
-
-          invitation.responseTokenHash =
-            tokenHash;
-
-          invitation.responseTokenExpiresAt =
-            new Date(
-              Date.now() +
-                30 * 24 * 60 * 60 * 1000,
-            );
-
-          invitation.responseStatus =
-            "PENDING";
-
-          invitation.respondedAt = null;
-
-          await invitation.save();
-
-          // -----------------------------------------------
-          // RESPONSE URLS
-          // -----------------------------------------------
-
-          const acceptUrl =
-            `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=accept`;
-
-          const declineUrl =
-            `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=decline`;
-
-          // -----------------------------------------------
-          // MERGE INFO
-          // -----------------------------------------------
-
-          const mergeInfo =
-            buildMergeInfo(
-              invitation,
-              {
-                acceptUrl,
-                declineUrl,
-              },
-            );
-
-          // -----------------------------------------------
-          // SEND EMAIL
-          // -----------------------------------------------
-
-          const response =
-            await sendEmailWithTemplate({
-              to: invitation.email,
-              name: invitation.name,
-              templateKey,
-              mergeInfo,
-            });
-
-          results.push({
-            invitationId:
-              invitation._id,
-
-            email:
-              invitation.email,
-
-            name:
-              invitation.name,
-
-            group:
-              invitation.group,
-
-            invitationType:
-              invitation.invitationType,
-
-            status: "SENT",
-
-            response,
-          });
-        } catch (emailError) {
-          console.error(
-            `Bulk email failed for ${invitation.email}:`,
-            emailError,
-          );
-
-          results.push({
-            invitationId:
-              invitation._id,
-
-            email:
-              invitation.email,
-
-            name:
-              invitation.name,
-
-            group:
-              invitation.group,
-
-            invitationType:
-              invitation.invitationType,
-
-            status: "FAILED",
-
-            message:
-              emailError?.error?.message ||
-              emailError?.message ||
-              "Email sending failed",
-          });
-        }
-      }
-
-      const successCount =
-        results.filter(
-          (item) =>
-            item.status === "SENT",
-        ).length;
-
-      const failedCount =
-        results.filter(
-          (item) =>
-            item.status === "FAILED",
-        ).length;
-
-      return res.status(200).json({
-        success: true,
-
-        message:
-          "Bulk faculty invitation email process completed",
-
-        summary: {
-          total:
-            results.length,
-
-          sent:
-            successCount,
-
-          failed:
-            failedCount,
-        },
-
-        results,
-      });
-    } catch (error) {
-      console.error(
-        "sendBulkFacultyInvitationEmails error:",
-        error,
-      );
-
-      return res.status(500).json({
+    if (invitations.length === 0) {
+      return res.status(404).json({
         success: false,
-        message:
-          error?.message ||
-          "Failed to send bulk faculty invitation emails",
+        message: "No faculty invitations found",
       });
     }
-  };
+
+    const baseUrl = process.env.FACULTY_RESPONSE_BASE_URL;
+
+    if (!baseUrl) {
+      throw new Error("FACULTY_RESPONSE_BASE_URL is not configured");
+    }
+
+    const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+
+    const results = [];
+
+    // ---------------------------------------------------
+    // SEND ONE BY ONE
+    // ---------------------------------------------------
+
+    for (const invitation of invitations) {
+      try {
+        // -----------------------------------------------
+        // GET TEMPLATE
+        // -----------------------------------------------
+
+        const templateKey = getFacultyTemplateKey(
+          invitation.group,
+          invitation.invitationType,
+        );
+
+        // -----------------------------------------------
+        // GENERATE RESPONSE TOKEN
+        // -----------------------------------------------
+
+        const rawToken = generateResponseToken();
+
+        const tokenHash = hashResponseToken(rawToken);
+
+        invitation.responseTokenHash = tokenHash;
+
+        invitation.responseTokenExpiresAt = new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000,
+        );
+
+        invitation.responseStatus = "PENDING";
+
+        invitation.respondedAt = null;
+
+        await invitation.save();
+
+        // -----------------------------------------------
+        // RESPONSE URLS
+        // -----------------------------------------------
+
+        const acceptUrl = `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=accept`;
+
+        const declineUrl = `${cleanBaseUrl}/api/faculty-invitations/respond/${rawToken}?action=decline`;
+
+        // -----------------------------------------------
+        // MERGE INFO
+        // -----------------------------------------------
+
+        const mergeInfo = buildMergeInfo(invitation, {
+          acceptUrl,
+          declineUrl,
+        });
+
+        // -----------------------------------------------
+        // SEND EMAIL
+        // -----------------------------------------------
+
+        const response = await sendEmailWithTemplate({
+          to: invitation.email,
+          name: invitation.name,
+          templateKey,
+          mergeInfo,
+        });
+
+        results.push({
+          invitationId: invitation._id,
+
+          email: invitation.email,
+
+          name: invitation.name,
+
+          group: invitation.group,
+
+          invitationType: invitation.invitationType,
+
+          status: "SENT",
+
+          response,
+        });
+      } catch (emailError) {
+        console.error(`Bulk email failed for ${invitation.email}:`, emailError);
+
+        results.push({
+          invitationId: invitation._id,
+
+          email: invitation.email,
+
+          name: invitation.name,
+
+          group: invitation.group,
+
+          invitationType: invitation.invitationType,
+
+          status: "FAILED",
+
+          message:
+            emailError?.error?.message ||
+            emailError?.message ||
+            "Email sending failed",
+        });
+      }
+    }
+
+    const successCount = results.filter(
+      (item) => item.status === "SENT",
+    ).length;
+
+    const failedCount = results.filter(
+      (item) => item.status === "FAILED",
+    ).length;
+
+    return res.status(200).json({
+      success: true,
+
+      message: "Bulk faculty invitation email process completed",
+
+      summary: {
+        total: results.length,
+
+        sent: successCount,
+
+        failed: failedCount,
+      },
+
+      results,
+    });
+  } catch (error) {
+    console.error("sendBulkFacultyInvitationEmails error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message:
+        error?.message || "Failed to send bulk faculty invitation emails",
+    });
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -820,25 +650,18 @@ export const sendBulkFacultyInvitationEmails =
  * This protects us from email security scanners
  * automatically opening the link.
  */
-export const showFacultyInvitationResponsePage =
-  async (req, res) => {
-    try {
-      const { token } =
-        req.params;
+export const showFacultyInvitationResponsePage = async (req, res) => {
+  try {
+    const { token } = req.params;
 
-      const { action } =
-        req.query;
+    const { action } = req.query;
 
-      // ---------------------------------------------------
-      // VALIDATE ACTION
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // VALIDATE ACTION
+    // ---------------------------------------------------
 
-      if (
-        !["accept", "decline"].includes(
-          action,
-        )
-      ) {
-        return res.status(400).send(`
+    if (!["accept", "decline"].includes(action)) {
+      return res.status(400).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -847,23 +670,20 @@ export const showFacultyInvitationResponsePage =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // FIND INVITATION
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // FIND INVITATION
+    // ---------------------------------------------------
 
-      const tokenHash =
-        hashResponseToken(token);
+    const tokenHash = hashResponseToken(token);
 
-      const invitation =
-        await FacultyInvitation.findOne({
-          responseTokenHash:
-            tokenHash,
-        });
+    const invitation = await FacultyInvitation.findOne({
+      responseTokenHash: tokenHash,
+    });
 
-      if (!invitation) {
-        return res.status(404).send(`
+    if (!invitation) {
+      return res.status(404).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -872,18 +692,17 @@ export const showFacultyInvitationResponsePage =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // CHECK EXPIRY
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // CHECK EXPIRY
+    // ---------------------------------------------------
 
-      if (
-        invitation.responseTokenExpiresAt &&
-        invitation.responseTokenExpiresAt <
-          new Date()
-      ) {
-        return res.status(410).send(`
+    if (
+      invitation.responseTokenExpiresAt &&
+      invitation.responseTokenExpiresAt < new Date()
+    ) {
+      return res.status(410).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -892,17 +711,14 @@ export const showFacultyInvitationResponsePage =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // ALREADY RESPONDED
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // ALREADY RESPONDED
+    // ---------------------------------------------------
 
-      if (
-        invitation.responseStatus !==
-        "PENDING"
-      ) {
-        return res.status(200).send(`
+    if (invitation.responseStatus !== "PENDING") {
+      return res.status(200).send(`
           <!DOCTYPE html>
           <html>
           <head>
@@ -936,22 +752,15 @@ export const showFacultyInvitationResponsePage =
           </body>
           </html>
         `);
-      }
+    }
 
-      const isAccept =
-        action === "accept";
+    const isAccept = action === "accept";
 
-      const actionText =
-        isAccept
-          ? "Accept"
-          : "Decline";
+    const actionText = isAccept ? "Accept" : "Decline";
 
-      const actionColor =
-        isAccept
-          ? "#198754"
-          : "#b00000";
+    const actionColor = isAccept ? "#198754" : "#b00000";
 
-      return res.status(200).send(`
+    return res.status(200).send(`
         <!DOCTYPE html>
         <html>
 
@@ -1058,33 +867,32 @@ export const showFacultyInvitationResponsePage =
             </p>
 
             <form
-              method="POST"
-              action="/api/faculty-invitations/respond/${token}"
-            >
+  method="POST"
+  action="/api/faculty-invitations/respond/${token}"
+  style="margin-top:30px;"
+>
+  <input
+    type="hidden"
+    name="action"
+    value="${action}"
+  />
 
-              <input
-                type="hidden"
-                name="action"
-                value="${action}"
-              />
-
-              <button
-                type="submit"
-                style="
-                  background:${actionColor};
-                  color:#ffffff;
-                  border:none;
-                  padding:14px 30px;
-                  border-radius:6px;
-                  font-size:16px;
-                  font-weight:bold;
-                  cursor:pointer;
-                "
-              >
-                Confirm ${actionText}
-              </button>
-
-            </form>
+  <button
+    type="submit"
+    style="
+      background:${actionColor};
+      color:#ffffff;
+      border:none;
+      padding:14px 30px;
+      border-radius:6px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    "
+  >
+    Confirm ${actionText}
+  </button>
+</form>
 
           </div>
 
@@ -1092,13 +900,10 @@ export const showFacultyInvitationResponsePage =
 
         </html>
       `);
-    } catch (error) {
-      console.error(
-        "showFacultyInvitationResponsePage error:",
-        error,
-      );
+  } catch (error) {
+    console.error("showFacultyInvitationResponsePage error:", error);
 
-      return res.status(500).send(`
+    return res.status(500).send(`
         <!DOCTYPE html>
         <html>
         <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -1107,8 +912,8 @@ export const showFacultyInvitationResponsePage =
         </body>
         </html>
       `);
-    }
-  };
+  }
+};
 
 /**
  * ---------------------------------------------------------
@@ -1129,21 +934,18 @@ export const showFacultyInvitationResponsePage =
  *   "action": "decline"
  * }
  */
-export const respondToFacultyInvitation =
-  async (req, res) => {
-    try {
-      const { token } =
-        req.params;
+export const respondToFacultyInvitation = async (req, res) => {
+  try {
+    const { token } = req.params;
 
-      const action =
-        req.body?.action;
+    const action = req.body?.action || req.query?.action;
 
-      // ---------------------------------------------------
-      // VALIDATE
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // VALIDATE
+    // ---------------------------------------------------
 
-      if (!token) {
-        return res.status(400).send(`
+    if (!token) {
+      return res.status(400).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -1151,14 +953,10 @@ export const respondToFacultyInvitation =
           </body>
           </html>
         `);
-      }
+    }
 
-      if (
-        !["accept", "decline"].includes(
-          action,
-        )
-      ) {
-        return res.status(400).send(`
+    if (!["accept", "decline"].includes(action)) {
+      return res.status(400).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -1166,23 +964,20 @@ export const respondToFacultyInvitation =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // FIND BY HASHED TOKEN
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // FIND BY HASHED TOKEN
+    // ---------------------------------------------------
 
-      const tokenHash =
-        hashResponseToken(token);
+    const tokenHash = hashResponseToken(token);
 
-      const invitation =
-        await FacultyInvitation.findOne({
-          responseTokenHash:
-            tokenHash,
-        });
+    const invitation = await FacultyInvitation.findOne({
+      responseTokenHash: tokenHash,
+    });
 
-      if (!invitation) {
-        return res.status(404).send(`
+    if (!invitation) {
+      return res.status(404).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -1191,18 +986,17 @@ export const respondToFacultyInvitation =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // CHECK EXPIRY
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // CHECK EXPIRY
+    // ---------------------------------------------------
 
-      if (
-        invitation.responseTokenExpiresAt &&
-        invitation.responseTokenExpiresAt <
-          new Date()
-      ) {
-        return res.status(410).send(`
+    if (
+      invitation.responseTokenExpiresAt &&
+      invitation.responseTokenExpiresAt < new Date()
+    ) {
+      return res.status(410).send(`
           <!DOCTYPE html>
           <html>
           <body style="font-family:Arial;text-align:center;padding:50px;">
@@ -1211,17 +1005,14 @@ export const respondToFacultyInvitation =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // PREVENT SECOND RESPONSE
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // PREVENT SECOND RESPONSE
+    // ---------------------------------------------------
 
-      if (
-        invitation.responseStatus !==
-        "PENDING"
-      ) {
-        return res.status(409).send(`
+    if (invitation.responseStatus !== "PENDING") {
+      return res.status(409).send(`
           <!DOCTYPE html>
           <html>
           <head>
@@ -1255,44 +1046,36 @@ export const respondToFacultyInvitation =
           </body>
           </html>
         `);
-      }
+    }
 
-      // ---------------------------------------------------
-      // SET STATUS
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // SET STATUS
+    // ---------------------------------------------------
 
-      const newStatus =
-        action === "accept"
-          ? "ACCEPTED"
-          : "DECLINED";
+    const newStatus = action === "accept" ? "ACCEPTED" : "DECLINED";
 
-      invitation.responseStatus =
-        newStatus;
+    invitation.responseStatus = newStatus;
 
-      invitation.respondedAt =
-        new Date();
+    invitation.respondedAt = new Date();
 
-      await invitation.save();
+    await invitation.save();
 
-      // ---------------------------------------------------
-      // NOTIFY ADMIN / ORGANIZING COMMITTEE
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // NOTIFY ADMIN / ORGANIZING COMMITTEE
+    // ---------------------------------------------------
 
-      await sendFacultyResponseNotification({
-        status: newStatus,
-        invitation,
-      });
+    await sendFacultyResponseNotification({
+      status: newStatus,
+      invitation,
+    });
 
-      // ---------------------------------------------------
-      // SUCCESS PAGE
-      // ---------------------------------------------------
+    // ---------------------------------------------------
+    // SUCCESS PAGE
+    // ---------------------------------------------------
 
-      const statusText =
-        newStatus === "ACCEPTED"
-          ? "accepted"
-          : "declined";
+    const statusText = newStatus === "ACCEPTED" ? "accepted" : "declined";
 
-      return res.status(200).send(`
+    return res.status(200).send(`
         <!DOCTYPE html>
         <html>
 
@@ -1371,13 +1154,10 @@ export const respondToFacultyInvitation =
 
         </html>
       `);
-    } catch (error) {
-      console.error(
-        "respondToFacultyInvitation error:",
-        error,
-      );
+  } catch (error) {
+    console.error("respondToFacultyInvitation error:", error);
 
-      return res.status(500).send(`
+    return res.status(500).send(`
         <!DOCTYPE html>
         <html>
         <body
@@ -1399,5 +1179,5 @@ export const respondToFacultyInvitation =
         </body>
         </html>
       `);
-    }
-  };
+  }
+};
