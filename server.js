@@ -67,19 +67,42 @@ const allowedOrigins = [
 ];
 
 
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     // Allow server-to-server & Postman
+//     if (!origin) return callback(null, true)
+
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true)
+//     }
+//     console.error("CORS blocked origin:", origin)
+//     return callback(new Error('Not allowed by CORS'))
+//   },
+//   credentials: true, //  REQUIRED for cookies
+// }
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow server-to-server & Postman
-    if (!origin) return callback(null, true)
+    // Allow:
+    // 1. Server-to-server requests
+    // 2. Postman
+    // 3. Requests with Origin: null
+    //    (HTML form submission from email confirmation page)
+    if (!origin || origin === "null") {
+      return callback(null, true);
+    }
 
     if (allowedOrigins.includes(origin)) {
-      return callback(null, true)
+      return callback(null, true);
     }
-    console.error("CORS blocked origin:", origin)
-    return callback(new Error('Not allowed by CORS'))
+
+    console.error("CORS blocked origin:", origin);
+
+    return callback(new Error("Not allowed by CORS"));
   },
-  credentials: true, //  REQUIRED for cookies
-}
+
+  credentials: true,
+};
 
 app.use(helmet())
 app.use(cors(corsOptions));
