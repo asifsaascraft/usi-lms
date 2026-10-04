@@ -1,3 +1,6 @@
+// Configure DNS first
+import "./config/dns.js";
+
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
@@ -43,6 +46,11 @@ import quizRoutes from "./routes/quizRoutes.js";
 import submitQuizRoutes from "./routes/submitQuizRoutes.js";
 import speakerAnalyticsRoutes from "./routes/speakerAnalyticsRoutes.js";
 import supportRoutes from "./routes/supportRoutes.js";
+
+
+import facultyInvitationRoutes
+  from "./routes/facultyInvitationRoutes.js";
+
 
 const app = express();
 
@@ -123,6 +131,7 @@ app.use("/api", submitQuizRoutes);
 app.use("/api", speakerAnalyticsRoutes);
 app.use("/api", supportRoutes);
 
+app.use("/api/faculty-invitations", facultyInvitationRoutes);
 
 // =======================
 // Start Server SAFELY
