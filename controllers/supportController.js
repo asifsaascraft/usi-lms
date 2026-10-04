@@ -1,6 +1,8 @@
 import SupportData from "../models/SupportData.js";
 import { generateSupportTicketNumber } from "../utils/generateSupportTicket.js";
 import sendEmailWithTemplate from "../utils/sendEmail.js";
+import User from "../models/User.js";
+
 
 /* =======================
    Create Support Message
@@ -61,6 +63,34 @@ export const createSupportMessage = async (req, res) => {
       status: "OPEN",
       isRead: false,
     });
+
+    // ==============================
+    //  FETCH ADMIN
+    // ==============================
+    const admin = await User.findOne({ role: "admin" }).select("email name");
+
+    if (!admin) {
+      console.warn("No admin found to send support email");
+    } else {
+      // ==============================
+      //  SEND EMAIL TO ADMIN
+      // ==============================
+      try {
+        await sendEmailWithTemplate({
+          to: admin.email,
+          name: admin.name || "Admin",
+          templateKey: "2518b.554b0da719bc314.k1.535f6dd0-3ee2-11f1-aaee-525400c92439.19db925452d",
+          mergeInfo: {
+            name,
+            email,
+            message,
+            TICKET_NUMBER: supportTicketNumber,
+          },
+        });
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+      }
+    }
 
     res.status(201).json({
       message: "Support request submitted successfully",

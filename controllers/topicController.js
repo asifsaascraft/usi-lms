@@ -68,10 +68,13 @@ export const createTopic = async (req, res) => {
       });
     }
 
-    if (topicType === "Quiz" && !quizMaster) {
+    if (
+      topicType === "Quiz" &&
+      (!quizMaster || !Array.isArray(quizMaster) || quizMaster.length === 0)
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Quiz Master is required for Quiz",
+        message: "At least one Quiz Master is required for Quiz",
       });
     }
 
@@ -127,10 +130,15 @@ export const updateTopic = async (req, res) => {
       });
     }
 
-    if (updateData.topicType === "Quiz" && !updateData.quizMaster) {
+    if (
+      updateData.topicType === "Quiz" &&
+      (!updateData.quizMaster ||
+        !Array.isArray(updateData.quizMaster) ||
+        updateData.quizMaster.length === 0)
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Quiz Master is required for Quiz",
+        message: "At least one Quiz Master is required for Quiz",
       });
     }
 

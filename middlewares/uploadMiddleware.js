@@ -131,3 +131,28 @@ export const uploadUserDocument = multer({
     fileSize: 2 * 1024 * 1024, // 2MB
   },
 });
+
+
+export const uploadFlyerImage = multer({
+  storage: multerS3({
+    s3,
+    bucket: process.env.AWS_BUCKET_NAME,
+    acl: "public-read",
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      cb(null, `flyers/${Date.now()}-${file.originalname}`);
+    },
+  }),
+
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"), false);
+    }
+  },
+
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB
+  },
+});
