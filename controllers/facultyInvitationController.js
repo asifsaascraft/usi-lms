@@ -620,8 +620,6 @@ export const sendBulkFacultyInvitationEmails = async (req, res) => {
 
         failed: failedCount,
       },
-
-      results,
     });
   } catch (error) {
     console.error("sendBulkFacultyInvitationEmails error:", error);
