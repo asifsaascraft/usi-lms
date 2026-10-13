@@ -77,12 +77,19 @@ const FacultyInvitationSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // For PANELIST:
-    // person[0] = Moderator
-    // person[1..] = Co-Panellists
-    //
-    // For MODERATOR:
-    // person[0..] = Panellists
+    // For PANELIST invitations: moderator details
+    moderators: {
+      type: [PanelPersonSchema],
+      default: [],
+    },
+
+    // For PANELIST invitations: co-panellist details
+    coPanellists: {
+      type: [PanelPersonSchema],
+      default: [],
+    },
+
+    // Keep this existing field for backward compatibility
     panelPeople: {
       type: [PanelPersonSchema],
       default: [],

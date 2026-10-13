@@ -87,6 +87,8 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
     mergeInfo.date = invitation.date || "";
 
     mergeInfo.time = invitation.time || "";
+
+    mergeInfo.venue = invitation.hall || "";
   }
 
   // -------------------------------------------------------
@@ -109,19 +111,33 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
   if (invitation.invitationType === "PANELIST") {
     mergeInfo.topic = invitation.topic || "";
-
     mergeInfo.date = invitation.date || "";
-
     mergeInfo.time = invitation.time || "";
-
     mergeInfo.hall = invitation.hall || "";
 
-    const panelPeople = invitation.panelPeople || [];
+    // New fields take priority.
+    // Fallback supports existing records using panelPeople.
+    const moderators = invitation.moderators?.length
+      ? invitation.moderators
+      : (invitation.panelPeople || []).slice(0, 1);
 
+    const coPanellists = invitation.coPanellists?.length
+      ? invitation.coPanellists
+      : (invitation.panelPeople || []).slice(1);
+
+    // Moderator table
     for (let i = 0; i < 4; i++) {
-      mergeInfo[`person_${i + 1}_name`] = panelPeople[i]?.name || "";
+      mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
 
-      mergeInfo[`person_${i + 1}_contact`] = panelPeople[i]?.contact || "";
+      mergeInfo[`moderator_${i + 1}_contact`] = moderators[i]?.contact || "";
+    }
+
+    // Co-panellist table
+    for (let i = 0; i < 4; i++) {
+      mergeInfo[`copanellist_${i + 1}_name`] = coPanellists[i]?.name || "";
+
+      mergeInfo[`copanellist_${i + 1}_contact`] =
+        coPanellists[i]?.contact || "";
     }
   }
 
