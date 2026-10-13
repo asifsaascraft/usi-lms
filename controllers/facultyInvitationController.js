@@ -56,6 +56,16 @@ import { getFacultyTemplateKey } from "../config/facultyInvitationTemplates.js";
  *   accept_url
  *   decline_url
  */
+
+const escapeHtml = (value = "") => {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 const buildMergeInfo = (invitation, responseUrls = {}) => {
   const mergeInfo = {
     faculty_name: invitation.name || "",
