@@ -5,6 +5,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const getCcRecipients = () => {
+  return (process.env.ZEPTO_CC_EMAILS || "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean)
+    .map((email) => ({
+      email_address: {
+        address: email,
+      },
+    }));
+};
+
 const client = new SendMailClient({
   url: process.env.ZEPTO_URL,
   token: process.env.ZEPTO_TOKEN,
@@ -49,6 +61,8 @@ const sendEmailWithTemplate = async ({ to, name, templateKey, mergeInfo }) => {
           },
         },
       ],
+
+      cc: getCcRecipients(),
 
       merge_info: mergeInfo,
     });
@@ -151,6 +165,17 @@ export const sendFacultyResponseNotification = async ({
             <strong>Group:</strong>
             ${escapeHtml(invitation.group)}
           </p>
+
+          ${
+            invitation.sessionName
+              ? `
+      <p>
+        <strong>Session Name:</strong>
+        ${escapeHtml(invitation.sessionName)}
+      </p>
+    `
+              : ""
+          }
 
           ${
             invitation.topic

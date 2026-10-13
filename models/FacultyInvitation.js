@@ -47,6 +47,11 @@ const FacultyInvitationSchema = new mongoose.Schema(
       trim: true,
     },
 
+    sessionName: {
+      type: String,
+      trim: true,
+    },
+
     topic: {
       type: String,
       trim: true,
@@ -71,7 +76,6 @@ const FacultyInvitationSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
 
     // For PANELIST:
     // person[0] = Moderator

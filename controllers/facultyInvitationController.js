@@ -60,6 +60,8 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
   const mergeInfo = {
     faculty_name: invitation.name || "",
 
+    session_name: invitation.sessionName || "",
+
     accept_url: responseUrls.acceptUrl || "",
 
     decline_url: responseUrls.declineUrl || "",
@@ -813,6 +815,17 @@ export const showFacultyInvitationResponsePage = async (req, res) => {
               </strong>
               the following invitation:
             </p>
+
+            ${
+              invitation.sessionName
+                ? `
+      <p>
+        <strong>Session Name:</strong>
+        ${escapeHtml(invitation.sessionName)}
+      </p>
+    `
+                : ""
+            }
 
             ${
               invitation.topic
