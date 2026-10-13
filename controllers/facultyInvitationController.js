@@ -453,6 +453,10 @@ export const sendSingleFacultyInvitationEmail = async (req, res) => {
       mergeInfo,
     });
 
+    // Update UI status only after successful email sending.
+    invitation.isMailSent = true;
+    await invitation.save();
+
     return res.status(200).json({
       success: true,
       message: "Faculty invitation email sent successfully",
@@ -473,6 +477,8 @@ export const sendSingleFacultyInvitationEmail = async (req, res) => {
         responseStatus: invitation.responseStatus,
 
         responseTokenExpiresAt: invitation.responseTokenExpiresAt,
+
+        isMailSent: invitation.isMailSent,
 
         mergeInfo,
 
@@ -589,6 +595,10 @@ export const sendBulkFacultyInvitationEmails = async (req, res) => {
           mergeInfo,
         });
 
+        // Mark email as sent for UI purposes only.
+        invitation.isMailSent = true;
+        await invitation.save();
+
         results.push({
           invitationId: invitation._id,
 
@@ -599,6 +609,8 @@ export const sendBulkFacultyInvitationEmails = async (req, res) => {
           group: invitation.group,
 
           invitationType: invitation.invitationType,
+
+          isMailSent: invitation.isMailSent,
 
           status: "SENT",
 

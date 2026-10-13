@@ -124,6 +124,12 @@ const FacultyInvitationSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    isMailSent: {
+      type: Boolean,
+      default: false,
+    },
+    
   },
 
   {
