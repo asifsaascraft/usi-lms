@@ -130,6 +130,8 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
 
       mergeInfo[`moderator_${i + 1}_contact`] = moderators[i]?.contact || "";
+
+      mergeInfo[`moderator_${i + 1}_email`] = moderators[i]?.email || "";
     }
 
     // Co-panellist table
@@ -138,6 +140,8 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
       mergeInfo[`copanellist_${i + 1}_contact`] =
         coPanellists[i]?.contact || "";
+
+      mergeInfo[`copanellist_${i + 1}_email`] = coPanellists[i]?.email || "";
     }
   }
 
@@ -160,6 +164,8 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo[`person_${i + 1}_name`] = panelPeople[i]?.name || "";
 
       mergeInfo[`person_${i + 1}_contact`] = panelPeople[i]?.contact || "";
+
+      mergeInfo[`person_${i + 1}_email`] = panelPeople[i]?.email || "";
     }
   }
 
