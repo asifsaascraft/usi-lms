@@ -29,6 +29,7 @@ const FacultyInvitationSchema = new mongoose.Schema(
       enum: [
         "WORKSHOP",
         "SOLO_TALK",
+        "SOLO_TALK_REIMBURSEMENT",
         "SOLO_TALK_ALL_COMPLIMENTARY",
         "PANELIST",
         "MODERATOR",
