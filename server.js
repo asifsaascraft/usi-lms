@@ -50,8 +50,7 @@ import flyerRoutes from "./routes/flyerRoutes.js";
 
 
 
-import facultyInvitationRoutes
-  from "./routes/facultyInvitationRoutes.js";
+import facultyInvitationRoutes from "./routes/facultyInvitationRoutes.js";
 
 
 const app = express();
@@ -160,7 +159,7 @@ app.use("/api", speakerAnalyticsRoutes);
 app.use("/api", supportRoutes);
 app.use("/api", flyerRoutes);
 
-app.use("/api/faculty-invitations", facultyInvitationRoutes);
+//app.use("/api/faculty-invitations", facultyInvitationRoutes);
 
 // =======================
 // Start Server SAFELY
