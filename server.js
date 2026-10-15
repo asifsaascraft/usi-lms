@@ -159,7 +159,7 @@ app.use("/api", speakerAnalyticsRoutes);
 app.use("/api", supportRoutes);
 app.use("/api", flyerRoutes);
 
-//app.use("/api/faculty-invitations", facultyInvitationRoutes);
+app.use("/api/faculty-invitations", facultyInvitationRoutes);
 
 // =======================
 // Start Server SAFELY
