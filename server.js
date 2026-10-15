@@ -63,6 +63,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://pedicon2026.vercel.app",
+  "https://demopedicon2026.vercel.app",
   process.env.ADMIN_FRONTEND_URL,
   process.env.USER_FRONTEND_URL,
 ];
