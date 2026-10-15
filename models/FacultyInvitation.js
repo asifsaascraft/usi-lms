@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const PanelPersonSchema = new mongoose.Schema(
@@ -25,13 +26,19 @@ const FacultyInvitationSchema = new mongoose.Schema(
   {
     invitationType: {
       type: String,
-      enum: ["WORKSHOP", "SOLO_TALK", "PANELIST", "MODERATOR"],
+      enum: [
+        "WORKSHOP",
+        "SOLO_TALK",
+        "SOLO_TALK_ALL_COMPLIMENTARY",
+        "PANELIST",
+        "MODERATOR",
+      ],
       required: true,
     },
 
     group: {
       type: String,
-      enum: ["MP", "OUT_OF_MP"],
+      enum: ["MP", "OUT_OF_MP", "NCD"],
       required: true,
     },
 
@@ -83,49 +90,42 @@ const FacultyInvitationSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // For PANELIST invitations: moderator details
+    // PANELIST invitation details
     moderators: {
       type: [PanelPersonSchema],
       default: [],
     },
 
-    // For PANELIST invitations: co-panellist details
     coPanellists: {
       type: [PanelPersonSchema],
       default: [],
     },
 
-    // Keep this existing field for backward compatibility
+    // Backward compatibility with existing records
     panelPeople: {
       type: [PanelPersonSchema],
       default: [],
     },
 
-    // ---------------------------------------------------------
-    // FACULTY INVITATION RESPONSE
-    // ---------------------------------------------------------
-
+    // Faculty invitation response
     responseStatus: {
       type: String,
       enum: ["PENDING", "ACCEPTED", "DECLINED"],
       default: "PENDING",
     },
 
-    // Store only the SHA-256 hash of the response token.
-    // The actual token is sent only inside the email link.
+    // Store only the SHA-256 hash of the response token
     responseTokenHash: {
       type: String,
       default: null,
       index: true,
     },
 
-    // Response link expiry
     responseTokenExpiresAt: {
       type: Date,
       default: null,
     },
 
-    // When faculty accepted/declined
     respondedAt: {
       type: Date,
       default: null,
@@ -135,9 +135,7 @@ const FacultyInvitationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    
   },
-
   {
     timestamps: true,
   },

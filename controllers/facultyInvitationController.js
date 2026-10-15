@@ -11,52 +11,6 @@ import {
 
 import { getFacultyTemplateKey } from "../config/facultyInvitationTemplates.js";
 
-/**
- * ---------------------------------------------------------
- * BUILD MERGE INFO
- * ---------------------------------------------------------
- *
- * Different ZeptoMail templates require different fields.
- *
- * WORKSHOP:
- *   faculty_name
- *   workshop_name
- *   date
- *   time
- *   venue
- *
- * SOLO_TALK:
- *   faculty_name
- *   topic
- *   date
- *   time
- *   hall
- *
- * PANELIST:
- *   faculty_name
- *   topic
- *   date
- *   time
- *   hall
- *   person_1_name
- *   person_1_contact
- *   ...
- *
- * MODERATOR:
- *   faculty_name
- *   topic
- *   date
- *   time
- *   hall
- *   person_1_name
- *   person_1_contact
- *   ...
- *
- * RESPONSE:
- *   accept_url
- *   decline_url
- */
-
 const escapeHtml = (value = "") => {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -69,44 +23,41 @@ const escapeHtml = (value = "") => {
 const buildMergeInfo = (invitation, responseUrls = {}) => {
   const mergeInfo = {
     faculty_name: invitation.name || "",
-
     session_name: invitation.sessionName || "",
-
     accept_url: responseUrls.acceptUrl || "",
-
     decline_url: responseUrls.declineUrl || "",
   };
 
   // -------------------------------------------------------
   // WORKSHOP
+  // Existing MP and OUT_OF_MP templates
   // -------------------------------------------------------
 
   if (invitation.invitationType === "WORKSHOP") {
     mergeInfo.workshop_name = invitation.workshopName || "";
-
     mergeInfo.date = invitation.date || "";
-
     mergeInfo.time = invitation.time || "";
-
     mergeInfo.venue = invitation.hall || "";
   }
 
   // -------------------------------------------------------
   // SOLO TALK
+  // Also supports NCD SOLO_TALK
   // -------------------------------------------------------
 
-  if (invitation.invitationType === "SOLO_TALK") {
+  if (
+    invitation.invitationType === "SOLO_TALK" ||
+    invitation.invitationType === "SOLO_TALK_ALL_COMPLIMENTARY"
+  ) {
     mergeInfo.topic = invitation.topic || "";
-
     mergeInfo.date = invitation.date || "";
-
     mergeInfo.time = invitation.time || "";
-
     mergeInfo.hall = invitation.hall || "";
   }
 
   // -------------------------------------------------------
   // PANELIST
+  // Also supports NCD PANELIST
   // -------------------------------------------------------
 
   if (invitation.invitationType === "PANELIST") {
@@ -115,8 +66,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
     mergeInfo.time = invitation.time || "";
     mergeInfo.hall = invitation.hall || "";
 
-    // New fields take priority.
-    // Fallback supports existing records using panelPeople.
+    // Prefer new fields; fall back to existing panelPeople.
     const moderators = invitation.moderators?.length
       ? invitation.moderators
       : (invitation.panelPeople || []).slice(0, 1);
@@ -125,7 +75,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       ? invitation.coPanellists
       : (invitation.panelPeople || []).slice(1);
 
-    // Moderator table
+    // Moderator details
     for (let i = 0; i < 4; i++) {
       mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
 
@@ -134,7 +84,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo[`moderator_${i + 1}_email`] = moderators[i]?.email || "";
     }
 
-    // Co-panellist table
+    // Co-panellist details
     for (let i = 0; i < 4; i++) {
       mergeInfo[`copanellist_${i + 1}_name`] = coPanellists[i]?.name || "";
 
@@ -147,15 +97,13 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
   // -------------------------------------------------------
   // MODERATOR
+  // Also supports NCD MODERATOR
   // -------------------------------------------------------
 
   if (invitation.invitationType === "MODERATOR") {
     mergeInfo.topic = invitation.topic || "";
-
     mergeInfo.date = invitation.date || "";
-
     mergeInfo.time = invitation.time || "";
-
     mergeInfo.hall = invitation.hall || "";
 
     const panelPeople = invitation.panelPeople || [];
