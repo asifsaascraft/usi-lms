@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const PanelPersonSchema = new mongoose.Schema(
@@ -32,7 +31,10 @@ const FacultyInvitationSchema = new mongoose.Schema(
         "SOLO_TALK_REIMBURSEMENT",
         "SOLO_TALK_ALL_COMPLIMENTARY",
         "PANELIST",
+        "PANELIST_ALL_COMPLIMENTARY",
+        "PANELIST_REIMBURSEMENT",
         "MODERATOR",
+        "MODERATOR_REIMBURSEMENT",
       ],
       required: true,
     },

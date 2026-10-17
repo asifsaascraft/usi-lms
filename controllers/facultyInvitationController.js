@@ -20,9 +20,6 @@ const escapeHtml = (value = "") => {
     .replace(/'/g, "&#039;");
 };
 
-
-
-
 const buildMergeInfo = (invitation, responseUrls = {}) => {
   const mergeInfo = {
     faculty_name: invitation.name || "",
@@ -36,55 +33,44 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
   // =====================================================
 
   if (invitation.group === "NCD") {
-    const {
-      invitationType,
-      topic,
-      date,
-      time,
-      hall,
-    } = invitation;
+    const { invitationType, topic, date, time, hall } = invitation;
 
     // ---------------------------------------------------
     // 1. NCD SOLO TALK
-    // ---------------------------------------------------
-
-    if (invitationType === "SOLO_TALK") {
-      mergeInfo.topic = topic || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-      mergeInfo.hall = hall || "";
-    }
-
-    // ---------------------------------------------------
     // 2. NCD SOLO TALK - REIMBURSEMENT
-    // ---------------------------------------------------
-
-    else if (
-      invitationType === "SOLO_TALK_REIMBURSEMENT"
-    ) {
-      mergeInfo.topic = topic || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-    }
-
-    // ---------------------------------------------------
     // 3. NCD SOLO TALK - ALL COMPLIMENTARY
     // ---------------------------------------------------
 
-    else if (
-      invitationType === "SOLO_TALK_ALL_COMPLIMENTARY"
+    if (
+      [
+        "SOLO_TALK",
+        "SOLO_TALK_REIMBURSEMENT",
+        "SOLO_TALK_ALL_COMPLIMENTARY",
+      ].includes(invitationType)
     ) {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
+
+      if (invitationType === "SOLO_TALK") {
+        mergeInfo.hall = hall || "";
+      }
     }
 
     // ---------------------------------------------------
     // 4. NCD PANELIST
+    // 5. NCD PANELIST - ALL COMPLIMENTARY
+    // 6. NCD PANELIST - REIMBURSEMENT
+    //
     // One moderator and three co-panellists
     // ---------------------------------------------------
-
-    else if (invitationType === "PANELIST") {
+    else if (
+      [
+        "PANELIST",
+        "PANELIST_ALL_COMPLIMENTARY",
+        "PANELIST_REIMBURSEMENT",
+      ].includes(invitationType)
+    ) {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
@@ -100,43 +86,38 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
         : legacyPeople.slice(1);
 
       // Moderator details
-      mergeInfo.moderator_1_name =
-        moderators[0]?.name || "";
+      mergeInfo.moderator_1_name = moderators[0]?.name || "";
 
-      mergeInfo.moderator_1_contact =
-        moderators[0]?.contact || "";
+      mergeInfo.moderator_1_contact = moderators[0]?.contact || "";
 
-      mergeInfo.moderator_1_email =
-        moderators[0]?.email || "";
+      mergeInfo.moderator_1_email = moderators[0]?.email || "";
 
-      // Three co-panellist entries required by the HTML
+      // Three co-panellists
       for (let i = 0; i < 3; i++) {
         const person = coPanellists[i] || {};
         const number = i + 1;
 
-        mergeInfo[`copanellist_${number}_name`] =
-          person.name || "";
+        mergeInfo[`copanellist_${number}_name`] = person.name || "";
 
-        mergeInfo[`copanellist_${number}_contact`] =
-          person.contact || "";
+        mergeInfo[`copanellist_${number}_contact`] = person.contact || "";
 
-        mergeInfo[`copanellist_${number}_email`] =
-          person.email || "";
+        mergeInfo[`copanellist_${number}_email`] = person.email || "";
       }
     }
 
     // ---------------------------------------------------
-    // 5. NCD MODERATOR
-    // Four panellist entries
+    // 7. NCD MODERATOR
+    // 8. NCD MODERATOR - REIMBURSEMENT
+    //
+    // Four panellists
     // ---------------------------------------------------
-
-    else if (invitationType === "MODERATOR") {
+    else if (
+      ["MODERATOR", "MODERATOR_REIMBURSEMENT"].includes(invitationType)
+    ) {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
 
-      // Prefer panelPeople for the moderator template.
-      // Fall back to coPanellists for newer records.
       const panelPeople = invitation.panelPeople?.length
         ? invitation.panelPeople
         : invitation.coPanellists || [];
@@ -145,21 +126,14 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
         const person = panelPeople[i] || {};
         const number = i + 1;
 
-        mergeInfo[`person_${number}_name`] =
-          person.name || "";
+        mergeInfo[`person_${number}_name`] = person.name || "";
 
-        mergeInfo[`person_${number}_contact`] =
-          person.contact || "";
+        mergeInfo[`person_${number}_contact`] = person.contact || "";
 
-        mergeInfo[`person_${number}_email`] =
-          person.email || "";
+        mergeInfo[`person_${number}_email`] = person.email || "";
       }
-    }
-
-    else {
-      throw new Error(
-        `Unsupported NCD invitation type: ${invitationType}`,
-      );
+    } else {
+      throw new Error(`Unsupported NCD invitation type: ${invitationType}`);
     }
 
     return mergeInfo;
@@ -174,8 +148,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
   // WORKSHOP
   if (invitation.invitationType === "WORKSHOP") {
-    mergeInfo.workshop_name =
-      invitation.workshopName || "";
+    mergeInfo.workshop_name = invitation.workshopName || "";
 
     mergeInfo.date = invitation.date || "";
     mergeInfo.time = invitation.time || "";
@@ -208,23 +181,18 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       : legacyPeople.slice(1);
 
     for (let i = 0; i < 4; i++) {
-      mergeInfo[`moderator_${i + 1}_name`] =
-        moderators[i]?.name || "";
+      mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
 
-      mergeInfo[`moderator_${i + 1}_contact`] =
-        moderators[i]?.contact || "";
+      mergeInfo[`moderator_${i + 1}_contact`] = moderators[i]?.contact || "";
 
-      mergeInfo[`moderator_${i + 1}_email`] =
-        moderators[i]?.email || "";
+      mergeInfo[`moderator_${i + 1}_email`] = moderators[i]?.email || "";
 
-      mergeInfo[`copanellist_${i + 1}_name`] =
-        coPanellists[i]?.name || "";
+      mergeInfo[`copanellist_${i + 1}_name`] = coPanellists[i]?.name || "";
 
       mergeInfo[`copanellist_${i + 1}_contact`] =
         coPanellists[i]?.contact || "";
 
-      mergeInfo[`copanellist_${i + 1}_email`] =
-        coPanellists[i]?.email || "";
+      mergeInfo[`copanellist_${i + 1}_email`] = coPanellists[i]?.email || "";
     }
   }
 
@@ -238,14 +206,11 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
     const panelPeople = invitation.panelPeople || [];
 
     for (let i = 0; i < 4; i++) {
-      mergeInfo[`person_${i + 1}_name`] =
-        panelPeople[i]?.name || "";
+      mergeInfo[`person_${i + 1}_name`] = panelPeople[i]?.name || "";
 
-      mergeInfo[`person_${i + 1}_contact`] =
-        panelPeople[i]?.contact || "";
+      mergeInfo[`person_${i + 1}_contact`] = panelPeople[i]?.contact || "";
 
-      mergeInfo[`person_${i + 1}_email`] =
-        panelPeople[i]?.email || "";
+      mergeInfo[`person_${i + 1}_email`] = panelPeople[i]?.email || "";
     }
   }
 
@@ -262,7 +227,6 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
   return mergeInfo;
 };
-
 
 /**
  * ---------------------------------------------------------
