@@ -51,10 +51,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
-
-      if (invitationType === "SOLO_TALK") {
-        mergeInfo.hall = hall || "";
-      }
+      mergeInfo.hall = hall || "";
     }
 
     // ---------------------------------------------------
@@ -74,6 +71,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
 
       const legacyPeople = invitation.panelPeople || [];
 
@@ -117,6 +115,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
       mergeInfo.topic = topic || "";
       mergeInfo.date = date || "";
       mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
 
       const panelPeople = invitation.panelPeople?.length
         ? invitation.panelPeople
