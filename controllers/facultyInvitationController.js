@@ -139,6 +139,135 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
     return mergeInfo;
   }
 
+  
+  // =====================================================
+  // MP TEMPLATES
+  // WORKSHOP, SOLO_TALK, PANELIST, MODERATOR
+  // =====================================================
+
+  if (invitation.group === "MP") {
+    const {
+      invitationType,
+      topic,
+      date,
+      time,
+      hall,
+      workshopName,
+    } = invitation;
+
+    // -----------------------------------------
+    // 1. MP WORKSHOP
+    // -----------------------------------------
+
+    if (invitationType === "WORKSHOP") {
+      mergeInfo.workshop_name = workshopName || "";
+      mergeInfo.date = date || "";
+      mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
+
+      // Keep the alias for compatibility with
+      // any older templates using {{venue}}.
+      mergeInfo.venue = hall || "";
+    }
+
+    // -----------------------------------------
+    // 2. MP SOLO TALK
+    // -----------------------------------------
+
+    else if (invitationType === "SOLO_TALK") {
+      mergeInfo.topic = topic || "";
+      mergeInfo.date = date || "";
+      mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
+    }
+
+    // -----------------------------------------
+    // 3. MP PANELIST
+    // Template fields:
+    // person_1_*, person_2_*, person_3_*
+    // -----------------------------------------
+
+    else if (invitationType === "PANELIST") {
+      mergeInfo.topic = topic || "";
+      mergeInfo.date = date || "";
+      mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
+
+      const legacyPeople = invitation.panelPeople || [];
+
+      const moderators = invitation.moderators?.length
+        ? invitation.moderators
+        : legacyPeople.slice(0, 1);
+
+      const coPanellists = invitation.coPanellists?.length
+        ? invitation.coPanellists
+        : legacyPeople.slice(1);
+
+      // One moderator + two co-panellists.
+      // Fall back to legacy panelPeople if needed.
+      const panelPeople = [
+        ...moderators.slice(0, 1),
+        ...coPanellists.slice(0, 2),
+      ];
+
+      for (let i = 0; i < 3; i++) {
+        const person = panelPeople[i] || {};
+        const number = i + 1;
+
+        mergeInfo[`person_${number}_name`] =
+          person.name || "";
+
+        mergeInfo[`person_${number}_contact`] =
+          person.contact || "";
+
+        mergeInfo[`person_${number}_email`] =
+          person.email || "";
+      }
+    }
+
+    // -----------------------------------------
+    // 4. MP MODERATOR
+    // Template fields:
+    // person_1_*, person_2_*
+    // -----------------------------------------
+
+    else if (invitationType === "MODERATOR") {
+      mergeInfo.topic = topic || "";
+      mergeInfo.date = date || "";
+      mergeInfo.time = time || "";
+      mergeInfo.hall = hall || "";
+
+      const panelPeople = invitation.panelPeople?.length
+        ? invitation.panelPeople
+        : invitation.coPanellists?.length
+          ? invitation.coPanellists
+          : invitation.moderators || [];
+
+      for (let i = 0; i < 2; i++) {
+        const person = panelPeople[i] || {};
+        const number = i + 1;
+
+        mergeInfo[`person_${number}_name`] =
+          person.name || "";
+
+        mergeInfo[`person_${number}_contact`] =
+          person.contact || "";
+
+        mergeInfo[`person_${number}_email`] =
+          person.email || "";
+      }
+    }
+
+    else {
+      throw new Error(
+        `Unsupported MP invitation type: ${invitationType}`,
+      );
+    }
+
+    return mergeInfo;
+  }
+
+
   // =====================================================
   // EXISTING MP / OUT_OF_MP TEMPLATES
   // Preserve the existing behavior
