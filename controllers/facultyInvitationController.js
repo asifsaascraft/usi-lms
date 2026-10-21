@@ -182,47 +182,38 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
     // -----------------------------------------
     // 3. MP PANELIST
-    // Template fields:
-    // person_1_*, person_2_*, person_3_*
     // -----------------------------------------
+  if (invitation.invitationType === "PANELIST") {
+    mergeInfo.topic = invitation.topic || "";
+    mergeInfo.date = invitation.date || "";
+    mergeInfo.time = invitation.time || "";
+    mergeInfo.hall = invitation.hall || "";
 
-    else if (invitationType === "PANELIST") {
-      mergeInfo.topic = topic || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-      mergeInfo.hall = hall || "";
+    const legacyPeople = invitation.panelPeople || [];
 
-      const legacyPeople = invitation.panelPeople || [];
+    const moderators = invitation.moderators?.length
+      ? invitation.moderators
+      : legacyPeople.slice(0, 1);
 
-      const moderators = invitation.moderators?.length
-        ? invitation.moderators
-        : legacyPeople.slice(0, 1);
+    const coPanellists = invitation.coPanellists?.length
+      ? invitation.coPanellists
+      : legacyPeople.slice(1);
 
-      const coPanellists = invitation.coPanellists?.length
-        ? invitation.coPanellists
-        : legacyPeople.slice(1);
+    for (let i = 0; i < 4; i++) {
+      mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
 
-      // One moderator + two co-panellists.
-      // Fall back to legacy panelPeople if needed.
-      const panelPeople = [
-        ...moderators.slice(0, 1),
-        ...coPanellists.slice(0, 2),
-      ];
+      mergeInfo[`moderator_${i + 1}_contact`] = moderators[i]?.contact || "";
 
-      for (let i = 0; i < 3; i++) {
-        const person = panelPeople[i] || {};
-        const number = i + 1;
+      mergeInfo[`moderator_${i + 1}_email`] = moderators[i]?.email || "";
 
-        mergeInfo[`person_${number}_name`] =
-          person.name || "";
+      mergeInfo[`copanellist_${i + 1}_name`] = coPanellists[i]?.name || "";
 
-        mergeInfo[`person_${number}_contact`] =
-          person.contact || "";
+      mergeInfo[`copanellist_${i + 1}_contact`] =
+        coPanellists[i]?.contact || "";
 
-        mergeInfo[`person_${number}_email`] =
-          person.email || "";
-      }
+      mergeInfo[`copanellist_${i + 1}_email`] = coPanellists[i]?.email || "";
     }
+  }
 
     // -----------------------------------------
     // 4. MP MODERATOR
@@ -268,7 +259,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
 
 
   // =====================================================
-  // EXISTING MP / OUT_OF_MP TEMPLATES
+  // OUT_OF_MP TEMPLATES
   // Preserve the existing behavior
   // =====================================================
 
