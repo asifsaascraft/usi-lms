@@ -233,7 +233,7 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
           ? invitation.coPanellists
           : invitation.moderators || [];
 
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 4; i++) {
         const person = panelPeople[i] || {};
         const number = i + 1;
 
