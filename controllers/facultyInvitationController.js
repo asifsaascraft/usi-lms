@@ -139,123 +139,106 @@ const buildMergeInfo = (invitation, responseUrls = {}) => {
   }
 
   
-  // =====================================================
-  // MP TEMPLATES
-  // WORKSHOP, SOLO_TALK, PANELIST, MODERATOR
-  // =====================================================
+// ---------------------------------------------------------
+// MP TEMPLATE MERGE INFO
+// ---------------------------------------------------------
+if (invitation.group === "MP") {
+  const {
+    invitationType,
+    topic,
+    date,
+    time,
+    hall,
+    workshopName,
+    sessionName,
+  } = invitation;
 
-  if (invitation.group === "MP") {
-    const {
-      invitationType,
-      topic,
-      date,
-      time,
-      hall,
-      workshopName,
-    } = invitation;
+  // Common fields used by MP templates
+  mergeInfo.session_name = sessionName || "";
+  mergeInfo.topic = topic || "";
+  mergeInfo.date = date || "";
+  mergeInfo.time = time || "";
+  mergeInfo.hall = hall || "";
+  mergeInfo.venue = hall || "";
 
-    // -----------------------------------------
-    // 1. MP WORKSHOP
-    // -----------------------------------------
+  // -------------------------------------------------------
+  // WORKSHOP
+  // -------------------------------------------------------
+  if (invitationType === "WORKSHOP") {
+    mergeInfo.workshop_name = workshopName || "";
+  }
 
-    if (invitationType === "WORKSHOP") {
-      mergeInfo.workshop_name = workshopName || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-      mergeInfo.hall = hall || "";
+  // -------------------------------------------------------
+  // SOLO TALK
+  // -------------------------------------------------------
+  else if (invitationType === "SOLO_TALK") {
+    // Common fields above are sufficient.
+  }
 
-      // Keep the alias for compatibility with
-      // any older templates using {{venue}}.
-      mergeInfo.venue = hall || "";
-    }
-
-    // -----------------------------------------
-    // 2. MP SOLO TALK
-    // -----------------------------------------
-
-    else if (invitationType === "SOLO_TALK") {
-      mergeInfo.topic = topic || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-      mergeInfo.hall = hall || "";
-    }
-
-    // -----------------------------------------
-    // 3. MP PANELIST
-    // -----------------------------------------
-  if (invitation.invitationType === "PANELIST") {
-    mergeInfo.topic = invitation.topic || "";
-    mergeInfo.date = invitation.date || "";
-    mergeInfo.time = invitation.time || "";
-    mergeInfo.hall = invitation.hall || "";
-
+  // -------------------------------------------------------
+  // PANELIST
+  // -------------------------------------------------------
+  else if (invitationType === "PANELIST") {
     const legacyPeople = invitation.panelPeople || [];
 
-    const moderators = invitation.moderators?.length
-      ? invitation.moderators
-      : legacyPeople.slice(0, 1);
+    const moderators =
+      invitation.moderators?.length > 0
+        ? invitation.moderators
+        : legacyPeople.slice(0, 1);
 
-    const coPanellists = invitation.coPanellists?.length
-      ? invitation.coPanellists
-      : legacyPeople.slice(1);
+    const coPanellists =
+      invitation.coPanellists?.length > 0
+        ? invitation.coPanellists
+        : legacyPeople.slice(1);
 
-    for (let i = 0; i < 4; i++) {
-      mergeInfo[`moderator_${i + 1}_name`] = moderators[i]?.name || "";
+    // Support the existing template's three person rows.
+    const panelPeople = [
+      ...moderators.slice(0, 1),
+      ...coPanellists.slice(0, 2),
+    ];
 
-      mergeInfo[`moderator_${i + 1}_contact`] = moderators[i]?.contact || "";
+    for (let i = 0; i < 3; i++) {
+      const person = panelPeople[i] || {};
+      const number = i + 1;
 
-      mergeInfo[`moderator_${i + 1}_email`] = moderators[i]?.email || "";
-
-      mergeInfo[`copanellist_${i + 1}_name`] = coPanellists[i]?.name || "";
-
-      mergeInfo[`copanellist_${i + 1}_contact`] =
-        coPanellists[i]?.contact || "";
-
-      mergeInfo[`copanellist_${i + 1}_email`] = coPanellists[i]?.email || "";
+      mergeInfo[`person_${number}_name`] = person.name || "";
+      mergeInfo[`person_${number}_contact`] = person.contact || "";
+      mergeInfo[`person_${number}_email`] = person.email || "";
     }
   }
 
-    // -----------------------------------------
-    // 4. MP MODERATOR
-    // Template fields:
-    // person_1_*, person_2_*
-    // -----------------------------------------
-
-    else if (invitationType === "MODERATOR") {
-      mergeInfo.topic = topic || "";
-      mergeInfo.date = date || "";
-      mergeInfo.time = time || "";
-      mergeInfo.hall = hall || "";
-
-      const panelPeople = invitation.panelPeople?.length
+  // -------------------------------------------------------
+  // MODERATOR
+  // -------------------------------------------------------
+  else if (invitationType === "MODERATOR") {
+    const panelPeople =
+      invitation.panelPeople?.length > 0
         ? invitation.panelPeople
-        : invitation.coPanellists?.length
+        : invitation.coPanellists?.length > 0
           ? invitation.coPanellists
           : invitation.moderators || [];
 
-      for (let i = 0; i < 4; i++) {
-        const person = panelPeople[i] || {};
-        const number = i + 1;
+    for (let i = 0; i < 3; i++) {
+      const person = panelPeople[i] || {};
+      const number = i + 1;
 
-        mergeInfo[`person_${number}_name`] =
-          person.name || "";
-
-        mergeInfo[`person_${number}_contact`] =
-          person.contact || "";
-
-        mergeInfo[`person_${number}_email`] =
-          person.email || "";
-      }
+      mergeInfo[`person_${number}_name`] = person.name || "";
+      mergeInfo[`person_${number}_contact`] = person.contact || "";
+      mergeInfo[`person_${number}_email`] = person.email || "";
     }
-
-    else {
-      throw new Error(
-        `Unsupported MP invitation type: ${invitationType}`,
-      );
-    }
-
-    return mergeInfo;
   }
+
+  // -------------------------------------------------------
+  // UNSUPPORTED MP TYPE
+  // -------------------------------------------------------
+  else {
+    throw new Error(
+      `Unsupported MP invitation type: ${invitationType}`
+    );
+  }
+
+  return mergeInfo;
+}
 
 
   // =====================================================
